@@ -55,28 +55,28 @@
           "name": "AffirmativesAndNegations",
           "values": [
             {
+              "id": "TRUE",
               "name": {
-                "value": "yeah"
+                "value": "yes",
+                "synonyms": [
+                  "yes",
+                  "yup",
+                  "yeah",
+                  "yep",
+                  "you know it"
+                ]
               }
             },
             {
+              "id": "FALSE",
               "name": {
-                "value": "nope"
-              }
-            },
-            {
-              "name": {
-                "value": "nah"
-              }
-            },
-            {
-              "name": {
-                "value": "no"
-              }
-            },
-            {
-              "name": {
-                "value": "yes"
+                "value": "no",
+                "synonyms": [
+                  "nope",
+                  "I do not",
+                  "nah",
+                  "no"
+                ]
               }
             }
           ]

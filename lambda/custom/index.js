@@ -6,7 +6,8 @@
 //TODO use database saves sparingly, rely on session until application closes
 //TODO fill out skill.json fully
 //TODO handle first prompts
-// TODO see if I can handle synonyms - can take care of this in unhandled - you can also have one singular unhandled intent. Make sure that it’s last in the argument list and that canHandle always returns true. That way, anything not otherwise handled will fall on through.
+//TODO to emit and call another intent just call the function
+//TODO see if I can handle synonyms - can take care of this in unhandled - you can also have one singular unhandled intent. Make sure that it’s last in the argument list and that canHandle always returns true. That way, anything not otherwise handled will fall on through.
 const Alexa = require('ask-sdk-core');
 
 //DynamoDb Memory Persistence
@@ -18,7 +19,6 @@ const https = require("https");
 const i18n = require('i18next');
 const sprintf = require('i18next-sprintf-postprocessor');
 const disaster_kit_list_items = require('./list-items');
-const helper = require('./helper');
 
 //List API end-point.
 const api_url = 'api.amazonalexa.com';
@@ -97,34 +97,31 @@ const LaunchRequestHandler = {
         attributes.surveyComplete = false;
         attributes.sessionState = 'SURVEY';  //SESSION STATES [SURVEY, LIST, COMPLETE]
         attributes.currentListItem = 1;
-        attributes.lastSurveySlot = null;
 
         speechText = requestAttributes.t('NEW_SESSION_MESSAGE', requestAttributes.t('SKILL_NAME'), surveyQuestions.length)+'<break time=".5s"/> ';
-        card_text = helper.stripTags(speechText);
+        card_text = stripTags(speechText);
     }else{
         const temp_survey_intent = attributes.temp_SurveyIntent;
-        questionsRemaining = helper.countEmptyFields(temp_survey_intent);
+        questionsRemaining = countEmptyFields(temp_survey_intent);
         if(questionsRemaining > 0){
-            let nextSurveyQuestion = helper.getNextListItem(questionsRemaining, surveyQuestions);
+            let nextSurveyQuestion = getNextListItem(questionsRemaining, surveyQuestions);
             let question_text = (questionsRemaining == 1) ? 'question' : 'questions';
             speechText = requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE', requestAttributes.t('SKILL_NAME'), questionsRemaining, question_text, question_text, nextSurveyQuestion);
-            card_text = helper.stripTags(speechText);
+            card_text = stripTags(speechText);
         }else{
             speechText = requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE', requestAttributes.t('SKILL_NAME'));
-            card_text = helper.stripTags(speechText);
+            card_text = stripTags(speechText);
         }
     }
 
     //saving data launch data to database and attributes
     attributesManager.setSessionAttributes(attributes);
+    attributesManager.setPersistentAttributes(attributes);
     await attributesManager.savePersistentAttributes();
 
-    let repromptText = null;
-    //.reprompt(repromptText)
-      //.addElicitSlotDirective(init_slot , handlerInput.requestEnvelope.request.intent)
-      //.withSimpleCard('Welcome', card_text)
+    let repromptText = '';
     if(questionsRemaining > 0){
-        let init_slot = helper.getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
+        let init_slot = getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
         repromptText = getRandomArrayItem(requestAttributes.t('SURVEY_QUESTIONS_REPROMPTS')[init_slot]);
 
         return handlerInput.responseBuilder
@@ -132,7 +129,7 @@ const LaunchRequestHandler = {
             .reprompt(repromptText)
             .getResponse();
     }else{
-        let repromptText = "You can say next or next item."
+        let repromptText = 'You can say next or next item';
     }
 
       return handlerInput.responseBuilder.speak(speechText)
@@ -157,7 +154,7 @@ const InProgressSurveyHandler = {
         const request = handlerInput.requestEnvelope.request;
         const attributesManager = handlerInput.attributesManager;
         const requestAttributes = attributesManager.getRequestAttributes();
-        const current_attributes = await attributesManager.getPersistentAttributes() || {};
+        let current_attributes = await attributesManager.getPersistentAttributes() || {};
 
         let updatedIntent = request.intent;
         let disambiguate_slot_response = null;
@@ -182,10 +179,11 @@ const InProgressSurveyHandler = {
         current_attributes.temp_SurveyIntent = handlerInput.requestEnvelope.request.intent;
         if (request.dialogState === "STARTED" || request.dialogState !== "COMPLETED") {
             at_state_end = false;
-        }else{
-            current_attributes.sessionState = 'LIST';
         }
 
+        console.log('dialog not complete attr::', current_attributes.temp_SurveyIntent.slots);
+
+        // Dialog is now complete and all required slots should be filled, calling normal handler
         handlerInput.attributesManager.setPersistentAttributes(current_attributes);
         handlerInput.attributesManager.setSessionAttributes(current_attributes);
 
@@ -205,7 +203,7 @@ const InProgressSurveyHandler = {
                 .getResponse();
         }else{
             await handlerInput.attributesManager.savePersistentAttributes();
-            // Dialog is now complete and all required slots should be filled, calling normal handler
+            console.log('is completed');
             if(at_state_end){
                 return request.intent.slots;
             }
@@ -223,7 +221,18 @@ const CompletedSurveyHandler = {
         const request = handlerInput.requestEnvelope.request;
         return request.type === 'IntentRequest' && request.intent.name === 'SurveyIntent';
     },
-    handle(handlerInput) {
+    async handle(handlerInput) {
+
+        const attributesManager = handlerInput.attributesManager;
+        //const current_attributes = await attributesManager.setSessionAttributes;
+        const current_attributes = await attributesManager.getPersistentAttributes() || {};
+        //session attributes are not updated here
+        current_attributes.sessionState = 'LIST';
+        handlerInput.attributesManager.setPersistentAttributes(current_attributes);
+        handlerInput.attributesManager.setSessionAttributes(current_attributes);
+
+        await handlerInput.attributesManager.savePersistentAttributes();
+
         console.log('completed survey handler');
         const responseBuilder = handlerInput.responseBuilder;
 
@@ -377,6 +386,31 @@ function isSlotValid(request, slotName){
 
 function getRandomArrayItem(myArray){
     return myArray[Math.floor(Math.random()*myArray.length)]
+}
+
+const stripTags = (someTextWithSSMLTags) => {
+    let regex = /(<([^>]+)>)/ig;
+    return someTextWithSSMLTags.replace(regex, "");
+}
+
+const countEmptyFields = (intent_obj) => {
+    if(typeof intent_obj === "undefined"){
+        return 3;
+    }
+    let slots = intent_obj.slots;
+    let count = 0;
+    for(let key in slots){
+        if(!slots[key].hasOwnProperty('value')){
+            count += 1;
+        }
+    }
+    return count;
+}
+const getNextListItem = (remaining_questions, list_questions) => {
+    if(remaining_questions == 0){
+        return false;
+    }
+    return list_questions[(list_questions.length - remaining_questions)];
 }
 
 const LocalizationInterceptor = {
