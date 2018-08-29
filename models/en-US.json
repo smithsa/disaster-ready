@@ -1,41 +1,166 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "disaster ready",
-      "types": [
-
-      ],
+      "invocationName": "disaster kit ready",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
-          "samples": [
-
-          ]
+          "samples": ["exit"]
         },
         {
           "name": "AMAZON.HelpIntent",
-          "samples": [
-
-          ]
+          "samples": []
         },
         {
           "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "SurveyIntent",
+          "slots": [
+            {
+              "name": "houseHoldQuantity",
+              "type": "AMAZON.NUMBER",
+              "samples": ["{houseHoldQuantity}"]
+            },
+            {
+              "name": "hasElderly",
+              "type": "AffirmativesAndNegations",
+              "samples": ["{hasElderly}"]
+            },
+            {
+              "name": "hasInfants",
+              "type": "AffirmativesAndNegations",
+              "samples": ["{hasInfants}"]
+            }
+          ],
           "samples": [
-
+            "{houseHoldQuantity}",
+            "{hasInfants}",
+            "{hasElderly}"
           ]
         },
         {
           "name": "HelloWorldIntent",
-          "slots": [
-
-          ],
+          "slots": [],
           "samples": [
             "hello",
             "say hello",
             "say hello world"
           ]
         }
+      ],
+      "types": [
+        {
+          "name": "AffirmativesAndNegations",
+          "values": [
+            {
+              "name": {
+                "value": "yeah"
+              }
+            },
+            {
+              "name": {
+                "value": "nope"
+              }
+            },
+            {
+              "name": {
+                "value": "nah"
+              }
+            },
+            {
+              "name": {
+                "value": "no"
+              }
+            },
+            {
+              "name": {
+                "value": "yes"
+              }
+            }
+          ]
+        }
       ]
-    }
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "SurveyIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "houseHoldQuantity",
+              "type": "AMAZON.NUMBER",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1162780729786.1432530920282"
+              }
+            },
+            {
+              "name": "hasInfants",
+              "type": "AffirmativesAndNegations",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1162780729786.1143025724798"
+              }
+            },
+            {
+              "name": "hasElderly",
+              "type": "AffirmativesAndNegations",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1162780729786.elderly"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.1162780729786.1432530920282",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "How many people are in your household?"
+          },
+          {
+            "type": "PlainText",
+            "value": "How many people do you live with?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.1162780729786.1143025724798",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Is there an infant in your household?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Is there a baby that lives with you?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.1162780729786.elderly",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Are there any elderly people in your household?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Do elderly people live with you?"
+          }
+        ]
+      }
+    ]
   }
 }

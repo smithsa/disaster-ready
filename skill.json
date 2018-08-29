@@ -5,11 +5,11 @@
         "en-US": {
           "summary": "Sample Short Description",
           "examplePhrases": [
-            "Alexa open hello world",
-            "Alexa tell hello world hello",
-            "Alexa ask hello world say hello"
+            "Alexa open disaster kit ready",
+            "Alexa tell disaster kit ready hello",
+            "Alexa ask disaster kit ready say hello"
           ],
-          "name": "Disaster Ready",
+          "name": "Disaster Kit Ready",
           "description": "Sample Full Description"
         }
       },
