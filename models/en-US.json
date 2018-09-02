@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "disaster kit ready",
+      "invocationName": "disaster ready",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -41,12 +41,21 @@
           ]
         },
         {
-          "name": "HelloWorldIntent",
+          "name": "NextItemIntent",
           "slots": [],
           "samples": [
-            "hello",
-            "say hello",
-            "say hello world"
+            "next item",
+            "please next item",
+            "please next",
+            "next",
+            "please next kit item",
+            "next kit item",
+            "next item please",
+            "next kit item please",
+            "next please",
+            "get next item",
+            "please get next item",
+            "get next item please"
           ]
         }
       ],
@@ -62,8 +71,12 @@
                   "yes",
                   "yup",
                   "yeah",
+                  "yea",
+                  "uh huh",
                   "yep",
-                  "you know it"
+                  "ye",
+                  "you know it",
+                  "I do"
                 ]
               }
             },
@@ -74,8 +87,11 @@
                 "synonyms": [
                   "nope",
                   "I do not",
+                  "I don't",
                   "nah",
-                  "no"
+                  "no",
+                  "ne",
+                  "I wish"
                 ]
               }
             }

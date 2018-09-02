@@ -5,11 +5,11 @@
         "en-US": {
           "summary": "Sample Short Description",
           "examplePhrases": [
-            "Alexa open disaster kit ready",
-            "Alexa tell disaster kit ready hello",
-            "Alexa ask disaster kit ready say hello"
+            "Alexa open disaster ready",
+            "Alexa tell disaster ready hello",
+            "Alexa ask disaster ready say hello"
           ],
-          "name": "Disaster Kit Ready",
+          "name": "Disaster Ready",
           "description": "Sample Full Description"
         }
       },
@@ -25,6 +25,14 @@
         }
       }
     },
+    "permissions": [
+      {
+        "name": "alexa::household:lists:read"
+      },
+      {
+        "name": "alexa::household:lists:write"
+      }
+    ],
     "manifestVersion": "1.0"
   }
 }
