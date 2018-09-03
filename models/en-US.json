@@ -44,18 +44,21 @@
           "name": "NextItemIntent",
           "slots": [],
           "samples": [
-            "next item",
-            "please next item",
-            "please next",
-            "next",
-            "please next kit item",
-            "next kit item",
-            "next item please",
-            "next kit item please",
-            "next please",
             "get next item",
             "please get next item",
-            "get next item please"
+            "please get next",
+            "get next",
+            "please get next kit item",
+            "get next kit item",
+            "get next item please",
+            "get next kit item please",
+            "get next please",
+            "get next item",
+            "please get next item",
+            "get next item please",
+            "ready",
+            "ready for next",
+            "ready for next item"
           ]
         }
       ],

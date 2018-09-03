@@ -37,6 +37,7 @@ const languageString = {
   en: {
     translation: {
       SKILL_NAME: 'Disaster Ready',
+      LIST_NAME: 'Emergency Supply Kit',
       SURVEY_QUESTIONS_SLOTS: ['houseHoldQuantity', 'hasInfants', 'hasElderly'],
       SURVEY_QUESTIONS: [ //order the same as model and update as model changes
         'How many people are in your household?',
@@ -64,7 +65,7 @@ const languageString = {
           'Welcome back to the %s skill. Let\'s pick up where we left off. You have %s %s remaining. Please answer the following %s. <break time=".8s"/> %s'
       ],
       RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE: [
-          'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your list you can say "next item" or "next"'
+          'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your list you can say "get next item" or "get next"'
       ],
     },
   },
@@ -122,8 +123,9 @@ const LaunchRequestHandler = {
     if (Object.keys(attributes).length === 0) {
         attributes.sessionState = 'SURVEY';  //SESSION STATES [SURVEY, LIST, COMPLETE]
         attributes.listID = '';
+        attributes.alexa_list_items = [];
         attributes.lastListItemID = null;
-        attributes.list_items_ids = [];
+        attributes.list_items_ids = {};
         speechText = requestAttributes.t('NEW_SESSION_MESSAGE', requestAttributes.t('SKILL_NAME'), surveyQuestions.length)+'<break time=".5s"/> ';
         card_text = stripTags(speechText);
     }else{
@@ -155,7 +157,7 @@ const LaunchRequestHandler = {
             .reprompt(repromptText)
             .getResponse();
     }else{
-        let repromptText = 'You can say next or next item';
+        let repromptText = 'You can say get next item or get next';
     }
 
       return handlerInput.responseBuilder.speak(speechText)
@@ -250,6 +252,7 @@ const CompletedSurveyHandler = {
     async handle(handlerInput) {
         console.log('completed survey handler');
         const attributesManager = handlerInput.attributesManager;
+        const requestAttributes = attributesManager.getRequestAttributes();
         //const current_attributes = await attributesManager.setSessionAttributes;
         const current_attributes = await attributesManager.getPersistentAttributes();
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
@@ -259,7 +262,7 @@ const CompletedSurveyHandler = {
         handlerInput.attributesManager.setPersistentAttributes(current_attributes);
         handlerInput.attributesManager.setSessionAttributes(current_attributes);
 
-        createNewList('Emergency Supply Kit', handlerInput, function(status, list_id){
+        createNewList(requestAttributes.t('LIST_NAME'), handlerInput, function(status, list_id){
             current_attributes.listID = list_id;
             let slot_list = getActiveSlots(current_attributes.temp_SurveyIntent);
             let emergency_kit_list = getListItemsByType(slot_list, disaster_kit_list);
@@ -268,7 +271,7 @@ const CompletedSurveyHandler = {
                 addListItem(list_id, list_item.name, handlerInput, async function(status, response_Data){
                         let list_item_id = response_Data.id;
                         let disaster_kit_id = list_item.id;
-                        current_attributes.list_items_ids.push({'id': disaster_kit_id, 'list_id':list_item_id, 'status': 1, 'is_reviewed': false});
+                        current_attributes.list_items_ids[list_item_id] = {'id': disaster_kit_id, 'list_id':list_item_id, 'status': 1, 'is_reviewed': false};
                         handlerInput.attributesManager.setPersistentAttributes(current_attributes);
                         handlerInput.attributesManager.setSessionAttributes(current_attributes);
                         await handlerInput.attributesManager.savePersistentAttributes();
@@ -277,11 +280,12 @@ const CompletedSurveyHandler = {
         });
 
         let speechOutput = 'Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/>';
-        speechOutput += 'To get the next item on your list you can say \"next item\" or \"next\"';
+        speechOutput += 'To get the next item on your list you can say \"get next item\" or \"get next\"';
 
 
         const responseBuilder = handlerInput.responseBuilder;
         return responseBuilder
+            .withShouldEndSession(false)
             .speak(speechOutput)
             .getResponse();
     },
@@ -293,32 +297,92 @@ const NextItemIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'NextItemIntent';
   },
   handle(handlerInput) {
-    let speechText = '';
+    let speechText = 'say next item or get next item';
     const attributesManager = handlerInput.attributesManager;
     const sessionAttributes = attributesManager.getSessionAttributes();
+    let list_items_ids = sessionAttributes.list_items_ids;
+    let items = [];
 
-    let internalListItemId = getActiveAndUnreviewedListId(sessionAttributes.list_items_ids);
-    let disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
-    let nextItem = getListItemsByInternalID(internalListItemId, disaster_kit_list);
-    if(nextItem.length > 0){
-        nextItem = nextItem[0];
-    }else{
-        //we are done and star over;
+    if(!handlerInput.requestEnvelope.context.System.user.permissions) {
+      console.log("permissions are not defined");
+        let permissions = ["alexa::household:lists:read", "alexa::household:lists:write"];
+        speechText = "Alexa List permissions are missing. You can grant permissions within the Alexa app.";
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withAskForPermissionsConsentCard(permissions)
+            .getResponse();
     }
-    let updated_list_data = updateListItemToReviewed(internalListItemId, sessionAttributes.list_items_ids);
-    sessionAttributes.list_items_ids = updated_list_data;
-    sessionAttributes.lastListItemID = internalListItemId;
-    attributesManager.setSessionAttributes(sessionAttributes);
-    //save here or somewhere else?
+    const system = handlerInput.requestEnvelope.context.System;
+    let consent_token = system.apiAccessToken;
 
-    console.log("#@$# next id id &^&&", internalListItemId);
-    console.log("#@$# next item object &^&&", nextItem);
-    speechText = "your next item is "+nextItem.name+". "+nextItem.short_description+" If you would like more information say more info";
+    let current_attrs = handlerInput.attributesManager.getSessionAttributes();
+    let current_list_id = current_attrs.listID;
 
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
-      .getResponse();
+    console.log("Starting get todo list call.");
+
+    let todo_path = '/v2/householdlists/'+current_list_id+'/active';
+
+    let options = {
+      custom: {'handler': handlerInput},
+      host: api_url,
+      port: api_port,
+      path: todo_path,
+      method: 'GET',
+      headers: {
+          'Authorization': 'Bearer ' + consent_token,
+          'Content-Type': 'application/json'
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+        httpGet(options).then((response) => {
+            items = response.items;
+            console.log('items sent, sade::', items);
+            if(!items) {
+                let  permissions = ["alexa::household:lists:read", "alexa::household:lists:write"];
+                speechText = "Alexa List permissions are missing. You can grant permissions within the Alexa app.";
+
+                resolve(handlerInput.responseBuilder
+                    .speak(speechText)
+                    .withAskForPermissionsConsentCard(permissions)
+                    .getResponse());
+
+            }else if(items === list_is_empty){
+                speechText = "Your list is empty. You have no items on your Emergency Supply Kit list.";
+                resolve(handlerInput.responseBuilder
+                    .speak(speechText)
+                    .withShouldEndSession(false)
+                    .getResponse());
+            }else{
+                let current_list_item = null;
+                //TODO handle case when items they add are on the list
+                for(let i = 0;  i < items.length; i++){
+                    let list_item_skill_id = items[i].id;
+                    if(list_items_ids[list_item_skill_id].is_reviewed === false){
+                        list_items_ids[list_item_skill_id].is_reviewed = true;
+                        current_list_item = items[i];
+                        break;
+                    }
+                }
+
+                if(current_list_item == null){
+                    speechText = "There are no more items on your emergency supply kit list.";
+                }else{
+                    speechText = "The next item is " + current_list_item.value;
+                    attributesManager.savePersistentAttributes();
+                }
+
+                resolve(handlerInput.responseBuilder
+                    .speak(speechText)
+                    .reprompt(speechText)
+                    .withShouldEndSession(false)
+                    .getResponse());
+            }
+        }).catch((error) => {
+            console.log(error);
+        });
+    });
+
   },
 };
 
@@ -459,8 +523,6 @@ const addListItem = function(listId, listItemName, handlerInput, callback) {
         "status": "active" // item status (Enum: "active" or "completed")
     };
 
-    //var consent_token = session.user.permissions.consentToken;
-
     let options = {
         host: api_url,
         port: api_port,
@@ -493,6 +555,120 @@ const addListItem = function(listId, listItemName, handlerInput, callback) {
         });
     }).end(JSON.stringify(postData));
 };
+
+/**
+ * Helper function to retrieve the top to-do item.
+ */
+const getAllListItems = function(handlerInput, callback) {
+    return new Promise(function(resolve, reject) {
+        getToDoList(handlerInput, function(handlerInput, returnValue) {
+            if(!returnValue) {
+                callback(null);
+                reject(null);
+            }
+            else if(!returnValue.items || returnValue.items.length === 0) {
+                callback(handlerInput, list_is_empty);
+                resolve(list_is_empty);
+            }
+            else {
+                callback(handlerInput, returnValue.items);
+                resolve(returnValue.items);
+            }
+        });
+    });
+};
+
+/**
+ * List API to retrieve the customer list.
+ */
+const getToDoList = function(handlerInput, callback) {
+        if(!handlerInput.requestEnvelope.context.System.user.permissions) {
+            console.log("permissions are not defined");
+            callback(null);
+            return;
+        }
+        const system = handlerInput.requestEnvelope.context.System;
+        let consent_token = system.apiAccessToken;
+
+        let current_attrs = handlerInput.attributesManager.getSessionAttributes();
+        let current_list_id = current_attrs.listID;
+
+        console.log("Starting get todo list call.");
+
+        let todo_path = '/v2/householdlists/'+current_list_id+'/active';
+
+        let options = {
+            custom: {'handler': handlerInput},
+            host: api_url,
+            port: api_port,
+            path: todo_path,
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + consent_token,
+                'Content-Type': 'application/json'
+            }
+        }
+
+        https.request(options, (res) => {
+            console.log('STATUS: ', res.statusCode);
+            console.log('HEADERS: ', JSON.stringify(res.headers));
+
+            if(res.statusCode === 403) {
+                console.log("permissions are not granted");
+                callback(null);
+                return;
+            }
+
+            let body = [];
+            res.on('data', function(chunk) {
+                body.push(chunk);
+            }).on('end', function() {
+                body = Buffer.concat(body).toString();
+                callback(options.custom.handler, JSON.parse(body));
+            });
+
+            res.on('error', (e) => {
+                console.log(`Problem with request: ${e.message}`);
+            });
+        }).end();
+};
+
+function httpGet(options) {
+    return new Promise(((resolve, reject) => {
+
+        const request = https.request(options, (response) => {
+            response.setEncoding('utf8');
+            let returnData = '';
+
+            if((response.statusCode < 200 || response.statusCode >= 300) && response.statusCode !== 403) {
+                return reject(new Error(`${response.statusCode}`));
+            }
+
+            if(response.statusCode === 403) {
+                resolve(null);
+                console.log("permissions are not granted");
+            }
+
+            response.on('data', (chunk) => {
+                returnData += chunk;
+            });
+
+            response.on('end', () => {
+                resolve(JSON.parse(returnData));
+            });
+
+            response.on('error', (error) => {
+                reject(error);
+            });
+        });
+
+        request.on('error', function (error) {
+            reject(error);
+        });
+
+        request.end();
+    }));
+}
 
 /*
  *  General Helper Functions
@@ -609,12 +785,26 @@ const getActiveSlots = (intent) => {
     return active_slots;
 }
 
-const getActiveAndUnreviewedListId = (list_ids_obj) => {
-    for(const key of Object.keys(list_ids_obj)){
-        if(list_ids_obj[key].status === 1 && list_ids_obj[key].is_reviewed === false) {
-            return list_ids_obj[key].id;
+const getActiveAndUnreviewedListId = (list_ids_obj, handlerInput) => {
+    let return_id = null;
+    console.log('list length', list_ids_obj.length);
+    for(let i = 0; i < list_ids_obj.length; i++){
+        console.log('listy list', list_ids_obj[i]);
+        if(list_ids_obj[i].is_reviewed === false) {
+            list_ids_obj[i].is_reviewed = true;
+            return_id = list_ids_obj[i].id;
+            break;
         }
     }
+    let session_attr = handlerInput.attributesManager.getSessionAttributes();
+    session_attr.list_items_ids = list_ids_obj;
+    if(return_id !== null){
+        session_attr.lastListItemID = return_id;
+    }
+    handlerInput.attributesManager.setPersistentAttributes(session_attr);
+    handlerInput.attributesManager.setSessionAttributes(session_attr);
+
+    return return_id;
 }
 const updateListItemToReviewed = (list_id, list) =>{
     for(let i = 0; list.length; i++){
