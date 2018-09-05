@@ -252,39 +252,41 @@ const CompletedSurveyHandler = {
         console.log('completed survey handler');
         const attributesManager = handlerInput.attributesManager;
         const requestAttributes = attributesManager.getRequestAttributes();
-        const current_attributes = await attributesManager.getPersistentAttributes();
+        let current_attributes = await attributesManager.getPersistentAttributes();
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
         current_attributes.sessionState = 'LIST';
         handlerInput.attributesManager.setPersistentAttributes(current_attributes);
         handlerInput.attributesManager.setSessionAttributes(current_attributes);
 
         return new Promise((resolve, reject) => {
-            createNewList(requestAttributes.t('LIST_NAME'), handlerInput).then((response) => {
+            createNewList(requestAttributes.t('LIST_NAME'), handlerInput).then(async (response) => {
                 if(response.statusCode == 201){ //success
                     current_attributes.listID = response.listId;
                     let list_id = response.listId;
                     let slot_list = getActiveSlots(current_attributes.temp_SurveyIntent);
                     let emergency_kit_list = getListItemsByType(slot_list, disaster_kit_list);
                     for(let list_item of emergency_kit_list){
-                        addListItem(list_id, list_item.name, handlerInput).then(function(result){
-                            let list_item_id = result.id;
+                        addListItem(list_id, list_item.name, handlerInput, async function(status, response_Data){
+                            let list_item_id = response_Data.id;
                             let disaster_kit_id = list_item.id;
                             current_attributes.list_items_ids[list_item_id] = {'id': disaster_kit_id, 'list_id':list_item_id, 'status': 1, 'is_reviewed': false};
-                            handlerInput.attributesManager.setPersistentAttributes(current_attributes);
                             handlerInput.attributesManager.setSessionAttributes(current_attributes);
-                            handlerInput.attributesManager.savePersistentAttributes();
+                            handlerInput.attributesManager.setPersistentAttributes(current_attributes);
+                            await handlerInput.attributesManager.savePersistentAttributes();
                         });
                     }
                 }else{
                     //TODO write list failure
                 }
-            }).then(function(response){
+            }).then(function(){
+
+                console.log('attribute inside promise', current_attributes);
+
                 let speechOutput = 'Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/>';
                 speechOutput += 'To get the next item on your list you can say \"get next item\" or \"get next\"';
 
                 const responseBuilder = handlerInput.responseBuilder;
 
-                console.log("message", response);
                 resolve(responseBuilder
                     .withShouldEndSession(false)
                     .speak(speechOutput)
@@ -303,7 +305,7 @@ const NextItemIntentHandler = {
     let speechText = '';
     let  repromptText = '';
     const attributesManager = handlerInput.attributesManager;
-    const sessionAttributes = attributesManager.getSessionAttributes();
+    let sessionAttributes =  await attributesManager.getPersistentAttributes() || {};
     let list_items_ids = sessionAttributes.list_items_ids;
     const system = handlerInput.requestEnvelope.context.System;
     let consent_token = system.apiAccessToken;
@@ -360,11 +362,8 @@ const NextItemIntentHandler = {
                     .getResponse());
             }else{
                 let current_list_item = null;
-                console.log('session variables looking for', sessionAttributes);
                 for(let i = 0;  i < items.length; i++){
                     let list_item_skill_id = items[i].id;
-                    console.log('list items', list_items_ids);
-                    console.log('list item. ids', list_item_skill_id);
                     if(list_items_ids.hasOwnProperty(list_item_skill_id)){
                         if(list_items_ids[list_item_skill_id].is_reviewed === false){
                             sessionAttributes.list_items_ids[list_item_skill_id].is_reviewed = true;
@@ -379,23 +378,25 @@ const NextItemIntentHandler = {
                 }
 
                 if(items.length === 0){
+                    //TODO return statement
                     console.log('item length is zero');
                     speechText = "There are no more items on your emergency supply kit list.";
                     repromptText = "You have completed your emergency supply kit list! All items have been checked off.";
-                }else if(current_list_item == null){
+                }
+                else if(current_list_item == null){ //not in the list
                     for(let i = 0;  i < items.length; i++){
                         let list_item_skill_id = items[i].id;
-                        if(!list_items_ids.hasOwnProperty(list_item_skill_id)){
+                        if(!list_items_ids.hasOwnProperty(list_item_skill_id)){ //custom list item
                             current_list_item = items[i];
                             break;
-                        }else{
+                        }else{//keys found
                             if(list_items_ids[list_item_skill_id].is_reviewed === false){
                                 current_list_item = items[i];
                                 break;
                             }
                         }
                     }
-                    console.log('current_list_item--->???', current_list_item);
+                    //TODO case where current_list_item!= null and is not a custom item
                     if(current_list_item !== null){
                         speechText = "The next item on your list is "+current_list_item.value + ". You added this item to your Emergency Supply Kit list.";
                         repromptText = "The next item on your list is "+current_list_item.value;
@@ -418,9 +419,8 @@ const NextItemIntentHandler = {
                         .reprompt(repromptText)
                         .withShouldEndSession(false)
                         .getResponse());
-                }else{
-                    console.log('made it to access the list item');
-                    console.log('current_list_item ===>', current_list_item);
+                }
+                else{
                     if(list_items_ids.hasOwnProperty(current_list_item.id)){
                         if(list_items_ids[current_list_item.id].hasOwnProperty('type')){
                             speechText = "The next item on your list is "+current_list_item.value + ". You added this item to your Emergency Supply Kit list.";
@@ -466,6 +466,13 @@ const NextItemIntentHandler = {
                         .getResponse());
                 }
             }
+
+            resolve(handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(speechText)
+                .withShouldEndSession(false)
+                .getResponse());
+
         }).catch((error) => {
             console.log(error);
         });
@@ -595,7 +602,10 @@ const createNewList = function(list_name, handlerInput) { //addNewListAction, 20
 /**
  * Add List Item API to retrieve the customer to-do list.
  */
-const addListItem = function(listId, listItemName, handlerInput) {
+/**
+ * Add List Item API to retrieve the customer to-do list.
+ */
+const addListItem = async function(listId, listItemName, handlerInput, callback) {
     console.log("prepare API call to add item to list");
 
     const system = handlerInput.requestEnvelope.context.System;
@@ -622,31 +632,31 @@ const addListItem = function(listId, listItemName, handlerInput) {
         }
     };
 
-    return new Promise(((resolve, reject) => {
-        let req = https.request(options, (res) => {
-            console.log('statusCode:', res.statusCode);
-            console.log('headers:', res.headers);
-            let data = "";
-            res.on('data', (d) => {
-                console.log("data: " + d);
-                data += d;
-                //    process.stdout.write(d);
-            });
-            res.on('error', (e) => {
-                console.log("error received");
-                console.error(e);
-                reject(e);
-            });
-            res.on('end', function() {
-                let responseMsg = eval('(' + data + ')');
-                responseMsg.statusCode = res.statusCode;
-                resolve(responseMsg);
-                return;
-            });
-        }).end(JSON.stringify(postData));
-    }));
-};
+    let req = https.request(options, (res) => {
+        console.log('statusCode:', res.statusCode);
+        console.log('headers:', res.headers);
+        let data = "";
+        res.on('data', (d) => {
+            console.log("data: " + d);
+            data += d;
+            //    process.stdout.write(d);
+        });
+        res.on('error', (e) => {
+            console.log("error received");
+            console.error(e);
+        });
+        res.on('end', function() {
+            let responseMsg = eval('(' + data + ')');
+            console.log('data from add list item:', responseMsg);
+            callback(res.statusCode, responseMsg);
+            return;
+        });
+    }).end(JSON.stringify(postData));
 
+    return new Promise(function(resolve, reject) {
+        resolve(postData);
+    });
+};
 /**
  * Helper function to retrieve the top to-do item.
  */
