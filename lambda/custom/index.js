@@ -1007,7 +1007,7 @@ const getStringOfListItems = (filtered_items) => {
     if(filtered_items.length === 1){
         return filtered_items[0].value;
     }else if(filtered_items.length === 2){
-        return filtered_items[0].value + ' and '+filtered_items[1];
+        return filtered_items[0].value + ' and '+filtered_items[1].value;
     }
 
     const filtered_items_length = filtered_items.length;
