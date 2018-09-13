@@ -6,11 +6,6 @@
 //TODO register for aws credits
 //TODO fill out skill.json fully
 
-//DEV
-//TODO handle first prompts
-//TODO handle case for calling, manging, adding items to an archived list
-//TODO permission handling at each level
-//TODO create repeat Intent
 const Alexa = require('ask-sdk-core');
 
 //DynamoDb Memory Persistence
@@ -34,61 +29,66 @@ const listStatuses = {
 const languageString = {
   en: {
     translation: {
-      SKILL_NAME: 'Disaster Ready',
-      LIST_NAME: 'Emergency Supply Kit',
-      SURVEY_QUESTIONS_SLOTS: ['houseHoldQuantity', 'hasInfants', 'hasElderly'],
-      SURVEY_QUESTIONS: [ //order the same as model and update as model changes
+    SKILL_NAME: 'Disaster Ready',
+    LIST_NAME: 'Emergency Supply Kit',
+    SURVEY_QUESTIONS_SLOTS: ['houseHoldQuantity', 'hasInfants', 'hasElderly'],
+    SURVEY_QUESTIONS: [ //order the same as model and update as model changes
         'Do you live with people are in your household?',
         'Is there an infant in your household?',
         'Are there any elderly people in your household?',
-      ],
-      SURVEY_QUESTIONS_REPROMPTS_PREFACES : ['Sorry, I didn\'t get that. %s %s',
-          'I didn\'t seem to get that, please answer the following question again. %s %s',
-          'Pardon me, I didn\'t seem to get that. %s %s',
-          'Sorry, I didn\'t understand your answer. Please answer the question again. %s %s',
-      ],
-      SURVEY_QUESTIONS_REPROMPTS: {
-          'houseHoldQuantity': ['Do you live with other people?', 'Are other people in your household?'],
-          'hasInfants': ['Does a baby live with you?', 'Is there a baby in your household?', 'Are there any infants in your household?'],
-          'hasElderly': ['Do you live with any elderly people?', 'Do you live with a person who is a senior citizen?']
-      },
-      SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
-      SURVEY_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list. Congratulations! <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Thank you for using the Disaster Ready Skill.',
-      NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters.<break time=".5s"/> First answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
-      RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE: [
-          'Welcome back to the %s skill. Let\'s pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.'
-      ],
-      RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE: [
-          'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your %s list you can say "next item" or "next"'
-      ],
-      START_PERMISSIONS_MISSING: 'Welcome to the %s skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
-      RESTART_SESSION_LAUNCH_MESSAGE: 'Okay, let\'s start over. I will walk you through building an emergency supply kit for disasters again. Let\'s go through the survey once more to consider the unique needs of your household. To begin say: start survey.',
-      PERMISSIONS_MISSING: 'Alexa List permissions are missing. You can grant permissions within the Alexa app.',
-      REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, you can say, "next" or "next item." Or review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
-      REVIEWED_ALL_ITEMS_REPROMPT: 'You can say "next" or "next item" to review the remaining items again. You can review all completed items by saying "review completed". Or to review all remaining items say "review items remaining."',
-      LIST_MISSING: 'I was unable to find your %s List. Please create a new list by saying "create new list."',
-      LIST_EXISTS: 'Thank you for answering my questions. It appears an %s list already exists. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list."',
-      LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create new list."',
-      LIST_STATE_NOT_READY: 'Sorry, you can not get any list items until the survey is complete.',
-      GOODBYE_MESSAGES: ['Thank you for using %s. Goodbye.', 'Thank you for using %s. See you later.', 'Thank you for using the %s skill. Toodles!', 'Goodbye! Remember to check in and use %s again soon!'],
-      HELP_MESSAGE_LIST_MISSING: 'Your %s list is missing. You can create a new list by saying "create new list."',
-      HELP_MESSAGE_LIST_ALREADY_EXISTS: 'A %s list exists already. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list." If you have already deleted the list simply say "create new list."',
-      HELP_MESSAGE_STATE_SURVEY: 'Please answer the questions asked so that I can customize your %s list. You can resume the survey by saying continue.',
-      HELP_MESSAGE_STATE_LIST: 'To get the next item on your list. Simply say, "next" or "next item."',
-      HELP_MESSAGE_GENERAL: 'To get the next item on your list you can say "next" or "next item. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items."',
-      HELP_MESSAGE_STATE_COMPLETE: 'You have completed all items on your %s list. You can start over by saying restart. Or you can leave the skill by saying exit.',
-      HELP_MESSAGE_ALL_LIST_ITEMS_REVIEWED: 'You have reviewed all items on your %s list. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items." Or to start over at the top of your list say "next" or "next item."',
-      LIST_COMPLETE_MESSAGE_LAUNCH: 'Your %s list has been completed! Great job! You can start over by saying restart. Or leave the skill by saying exit.',
-      MORE_INFO_NOT_AVAILABLE: 'Sorry. Unfortunately, I do not have more information on this particular item. To get the next item on the list say: next or next item. To repeat the last item given, say: repeat.',
-      MORE_INFO_INVALID: 'You can\'t ask for more information at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
-      REPEAT_INVALID: 'You can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
-      GET_COMPLETED_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review your completed items on your list. Resume your survey by saying: continue.',
-      LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item no longer exists. Get the next item on the list by saying: next or next item.',
-      COMPLETED_ITEMS_EMPTY_LIST: 'Your %s list is has no completed items.',
-      NO_COMPLETED_ITEMS: 'There are no completed items on your list.',
-      COMPLETED_ITEMS: 'The items completed on your %s list are: %s.',
-      COMPLETED_ITEM: 'There is only one item completed on your %s list, which is : %s',
-      EXIT_MESSAGES: []
+    ],
+    SURVEY_QUESTIONS_REPROMPTS_PREFACES : ['Sorry, I didn\'t get that. %s %s',
+      'I didn\'t seem to get that, please answer the following question again. %s %s',
+      'Pardon me, I didn\'t seem to get that. %s %s',
+      'Sorry, I didn\'t understand your answer. Please answer the question again. %s %s',
+    ],
+    SURVEY_QUESTIONS_REPROMPTS: {
+        'houseHoldQuantity': ['Do you live with other people?', 'Are other people in your household?'],
+        'hasInfants': ['Does a baby live with you?', 'Is there a baby in your household?', 'Are there any infants in your household?'],
+        'hasElderly': ['Do you live with any elderly people?', 'Do you live with a person who is a senior citizen?']
+    },
+    SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
+    SURVEY_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list. Congratulations! <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Thank you for using the Disaster Ready Skill.',
+    NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters.<break time=".5s"/> First answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
+    RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE: [
+        'Welcome back to the %s skill. Let\'s pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.'
+    ],
+    RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE: [
+        'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your %s list you can say "next item" or "next"'
+    ],
+    START_PERMISSIONS_MISSING: 'Welcome to the %s skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
+    RESTART_SESSION_LAUNCH_MESSAGE: 'Okay, let\'s start over. I will walk you through building an emergency supply kit for disasters again. Let\'s go through the survey once more to consider the unique needs of your household. To begin say: start survey.',
+    PERMISSIONS_MISSING: 'Alexa List permissions are missing. You can grant permissions within the Alexa app.',
+    REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, you can say, "next" or "next item." Or review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
+    REVIEWED_ALL_ITEMS_REPROMPT: 'You can say "next" or "next item" to review the remaining items again. You can review all completed items by saying "review completed". Or to review all remaining items say "review items remaining."',
+    LIST_MISSING: 'I was unable to find your %s List. Please create a new list by saying "create new list."',
+    LIST_EXISTS: 'Thank you for answering my questions. It appears an %s list already exists. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list."',
+    LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create new list."',
+    LIST_STATE_NOT_READY: 'Sorry, you can not get any list items until the survey is complete.',
+    GOODBYE_MESSAGES: ['Thank you for using %s. Goodbye.', 'Thank you for using %s. See you later.', 'Thank you for using the %s skill. Toodles!', 'Goodbye! Remember to check in and use %s again soon!'],
+    HELP_MESSAGE_LIST_MISSING: 'Your %s list is missing. You can create a new list by saying "create new list."',
+    HELP_MESSAGE_LIST_ALREADY_EXISTS: 'A %s list exists already. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list." If you have already deleted the list simply say "create new list."',
+    HELP_MESSAGE_STATE_SURVEY: 'Please answer the questions asked so that I can customize your %s list. You can resume the survey by saying continue.',
+    HELP_MESSAGE_STATE_LIST: 'To get the next item on your list. Simply say, "next" or "next item."',
+    HELP_MESSAGE_GENERAL: 'To get the next item on your list you can say "next" or "next item. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items."',
+    HELP_MESSAGE_STATE_COMPLETE: 'You have completed all items on your %s list. You can start over by saying restart. Or you can leave the skill by saying exit.',
+    HELP_MESSAGE_ALL_LIST_ITEMS_REVIEWED: 'You have reviewed all items on your %s list. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items." Or to start over at the top of your list say "next" or "next item."',
+    LIST_COMPLETE_MESSAGE_LAUNCH: 'Your %s list has been completed! Great job! You can start over by saying restart. Or leave the skill by saying exit.',
+    MORE_INFO_NOT_AVAILABLE: 'Sorry. Unfortunately, I do not have more information on this particular item. To get the next item on the list say: next or next item. To repeat the last item given, say: repeat.',
+    MORE_INFO_INVALID: 'You can\'t ask for more information at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
+    REPEAT_INVALID: 'You can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
+    GET_COMPLETED_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review your completed items on your list. Resume your survey by saying: continue.',
+    LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item no longer exists. Get the next item on the list by saying: next or next item.',
+    COMPLETED_ITEMS_EMPTY_LIST: 'Your %s list has no completed items.',
+    NO_COMPLETED_ITEMS: 'There are no completed items on your list.',
+    COMPLETED_ITEMS: 'The items completed on your %s list are: %s.',
+    COMPLETED_ITEM: 'There is only one item completed on your %s list, which is : %s',
+    GET_REMAINING_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review the remaining incompleted items on your list. Resume your survey by saying: continue.',
+    REMAINING_ITEMS_EMPTY_LIST: 'Your %s list has no items remaining. All list items have been completed!',
+    NO_REMAINING_ITEMS: 'There are no more items remaining on your list. You have completed your list!',
+    REMAINING_ITEMS: 'The items remaining on your %s list are: %s.',
+    REMAINING_ITEM: 'There is only one item remaining on your %s list, which is : %s',
+    EXIT_MESSAGES: []
     },
   },
   'en-US': {
@@ -508,7 +508,6 @@ const GetCompletedItemsIntentHandler = {
         let card_text = stripTags(speechOutPut);
         if(sessionAttribute.sessionState !== 'SURVEY'){
             const items = await getToDoItems(handlerInput, listId, listStatuses.COMPLETED);
-            console.log('ITEMS RETRIWEVED ====>>', items);
             if(!items) {
                 let  permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
                 speechOutPut = requestAttribute.t('PERMISSIONS_MISSING');
@@ -543,6 +542,60 @@ const GetCompletedItemsIntentHandler = {
         return responseBuilder
             .withShouldEndSession(false)
             .withSimpleCard('Completed List Items', card_text)
+            .speak(speechOutPut)
+            .getResponse();
+    }
+};
+
+const GetRemainingItemsIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'GetRemainingItemsIntent';
+    },
+    async handle(handlerInput) {
+        const attributesManager = handlerInput.attributesManager;
+        const sessionAttribute = attributesManager.getSessionAttributes();
+        const requestAttribute = attributesManager.getRequestAttributes();
+        const list_name = requestAttribute.t('LIST_NAME');
+        const listId = sessionAttribute.listID;
+        let speechOutPut = requestAttribute.t('GET_REMAINING_ITEMS_INVALID', list_name);
+        let card_text = stripTags(speechOutPut);
+        if(sessionAttribute.sessionState !== 'SURVEY'){
+            const items = await getToDoItems(handlerInput, listId, listStatuses.ACTIVE);
+            if(!items) {
+                let  permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
+                speechOutPut = requestAttribute.t('PERMISSIONS_MISSING');
+
+                return handlerInput.responseBuilder
+                    .speak(speechOutPut)
+                    .withAskForPermissionsConsentCard(permissions)
+                    .getResponse();
+
+            }else if(items === list_is_empty){
+                speechOutPut = requestAttribute.t('REMAINING_ITEMS_EMPTY_LIST', list_name);
+                card_text = stripTags(speechOutPut);
+            }else{
+                if(items.length === 0){
+                    speechOutPut = requestAttribute.t('NO_REMAINING_ITEMS');
+                }else{
+                    let string_completed_items = getStringOfListItems(items);
+                    if(items.length > 1){
+                        speechOutPut = requestAttribute.t('REMAINING_ITEMS', list_name, string_completed_items);
+                    }else{
+                        speechOutPut = requestAttribute.t('REMAINING_ITEM', list_name, string_completed_items);
+                    }
+                }
+                card_text = stripTags(speechOutPut);
+            }
+
+            //TODO Instructions of what to do next? refer to what prompt use this intent
+            speechOutPut += ' <break time=".3s"/>What would you like to do next? If you are not sure, you can say: help.';
+        }
+
+        const responseBuilder = handlerInput.responseBuilder;
+        return responseBuilder
+            .withShouldEndSession(false)
+            .withSimpleCard('Remaining List Items', card_text)
             .speak(speechOutPut)
             .getResponse();
     }
@@ -950,17 +1003,19 @@ const disambiguateSlot = async (handlerInput) => {
 }
 
 const getStringOfListItems = (filtered_items) => {
-    let list_items_string = "";
+    let list_items_string = '';
     if(filtered_items.length === 1){
         return filtered_items[0].value;
+    }else if(filtered_items.length === 2){
+        return filtered_items[0].value + ' and '+filtered_items[1];
     }
 
     const filtered_items_length = filtered_items.length;
     for(let i=0; i < filtered_items_length ; i++){
         if( i == (filtered_items_length - 1)){
-            list_items_string += "and "+filtered_items[i].value;
+            list_items_string += 'and '+filtered_items[i].value;
         }else{
-            list_items_string += filtered_items[i].value + ", ";
+            list_items_string += filtered_items[i].value + ', ';
         }
     }
 
@@ -1045,6 +1100,7 @@ exports.handler = skillBuilder
     LaunchRequestHandler,
     NextItemIntentHandler,
     GetCompletedItemsIntentHandler,
+    GetRemainingItemsIntentHandler,
     MoreInfoIntentHandler,
     RepeatIntentHandler,
     RestartIntentHandler,

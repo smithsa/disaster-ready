@@ -109,9 +109,17 @@
           "slots": [],
           "samples": [
             "review items remaining",
+            "review list items remaining",
             "review remaining items",
+            "review remaining list items",
             "get remaining items",
-            "get items remaining"
+            "get remaining list items",
+            "get items remaining",
+            "get list items remaining",
+            "get active list items",
+            "get active items",
+            "get incomplete items",
+            "get incomplete list items"
           ]
         },
         {
