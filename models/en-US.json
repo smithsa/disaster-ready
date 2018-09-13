@@ -87,6 +87,22 @@
             "restart",
             "start over"
           ]
+        },
+        {
+          "name": "MoreInfoIntent",
+          "slots": [],
+          "samples": [
+            "More info",
+            "More information"
+          ]
+        },
+        {
+          "name": "RepeatIntent",
+          "slots": [],
+          "samples": [
+            "repeat",
+            "repeat item"
+          ]
         }
       ],
       "types": [
