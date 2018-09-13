@@ -16,28 +16,33 @@
           "samples": []
         },
         {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
           "name": "SurveyIntent",
           "slots": [
             {
               "name": "houseHoldQuantity",
-              "type": "AMAZON.NUMBER",
-              "samples": ["{houseHoldQuantity}"]
-            },
-            {
-              "name": "hasElderly",
               "type": "AffirmativesAndNegations",
-              "samples": ["{hasElderly}"]
+              "samples": []
             },
             {
               "name": "hasInfants",
               "type": "AffirmativesAndNegations",
-              "samples": ["{hasInfants}"]
+              "samples": []
+            },
+            {
+              "name": "hasElderly",
+              "type": "AffirmativesAndNegations",
+              "samples": []
             }
           ],
           "samples": [
-            "{houseHoldQuantity}",
-            "{hasInfants}",
-            "{hasElderly}"
+            "continue survey",
+            "start survey",
+            "start",
+            "continue"
           ]
         },
         {
@@ -45,20 +50,42 @@
           "slots": [],
           "samples": [
             "get next item",
+            "next item",
             "please get next item",
+            "next item",
             "please get next",
+            "please next",
             "get next",
+            "next",
             "please get next kit item",
             "get next kit item",
+            "next kit item",
             "get next item please",
             "get next kit item please",
             "get next please",
+            "next item please",
+            "next please",
             "get next item",
             "please get next item",
             "get next item please",
             "ready",
             "ready for next",
             "ready for next item"
+          ]
+        },
+        {
+          "name": "CreateNewListIntent",
+          "slots": [],
+          "samples": [
+            "create new list"
+          ]
+        },
+        {
+          "name": "RestartIntent",
+          "slots": [],
+          "samples": [
+            "restart",
+            "start over"
           ]
         }
       ],
@@ -75,7 +102,6 @@
                   "yup",
                   "yeah",
                   "yea",
-                  "uh huh",
                   "yep",
                   "ye",
                   "you know it",
@@ -111,9 +137,9 @@
           "slots": [
             {
               "name": "houseHoldQuantity",
-              "type": "AMAZON.NUMBER",
+              "type": "AffirmativesAndNegations",
               "confirmationRequired": false,
-              "elicitationRequired": false,
+              "elicitationRequired": true,
               "prompts": {
                 "elicitation": "Elicit.Slot.1162780729786.1432530920282"
               }
@@ -146,11 +172,11 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "How many people are in your household?"
+            "value": "Are other people in your household?"
           },
           {
             "type": "PlainText",
-            "value": "How many people do you live with?"
+            "value": "Are there other people you live with?"
           }
         ]
       },

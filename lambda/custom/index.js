@@ -1,16 +1,16 @@
 /* eslint-disable  func-names */
 /* eslint-disable  no-console */
 
+//PRODUCTION
 //TODO Add auto-scaling for Dynamo
 //TODO register for aws credits
-//TODO use database saves sparingly, rely on session until application closes
 //TODO fill out skill.json fully
+
+//DEV
 //TODO handle first prompts
-//TODO to emit and call another intent just call the function
 //TODO handle case for calling, manging, adding items to an archived list
 //TODO permission handling at each level
 //TODO create repeat Intent
-//TODO see if I can handle synonyms - can take care of this in unhandled - you can also have one singular unhandled intent. Make sure that it’s last in the argument list and that canHandle always returns true. That way, anything not otherwise handled will fall on through.
 const Alexa = require('ask-sdk-core');
 
 //DynamoDb Memory Persistence
@@ -23,14 +23,12 @@ const https = require("https");
 const i18n = require('i18next');
 const sprintf = require('i18next-sprintf-postprocessor');
 
-//List API end-point.
-const api_url = 'api.amazonalexa.com';
-const api_port = '443';
-
 const list_is_empty = "#list_is_empty#";
 
-const affirmative_instruction = 'You can answer by saying "yes" or "no".';
-const quantitative_instruction = "You can answer by giving me a number.";
+const listStatuses = {
+    ACTIVE: 'active',
+    COMPLETED: 'completed',
+};
 
 /* jshint -W101 */
 const languageString = {
@@ -40,7 +38,7 @@ const languageString = {
       LIST_NAME: 'Emergency Supply Kit',
       SURVEY_QUESTIONS_SLOTS: ['houseHoldQuantity', 'hasInfants', 'hasElderly'],
       SURVEY_QUESTIONS: [ //order the same as model and update as model changes
-        'How many people are in your household?',
+        'Do you live with people are in your household?',
         'Is there an infant in your household?',
         'Are there any elderly people in your household?',
       ],
@@ -50,23 +48,38 @@ const languageString = {
           'Sorry, I didn\'t understand your answer. Please answer the question again. %s %s',
       ],
       SURVEY_QUESTIONS_REPROMPTS: {
-          'houseHoldQuantity': ['How many people do you live with?', 'What is the size of your household?'],
+          'houseHoldQuantity': ['Do you live with other people?', 'Are other people in your household?'],
           'hasInfants': ['Does a baby live with you?', 'Is there a baby in your household?', 'Are there any infants in your household?'],
           'hasElderly': ['Do you live with any elderly people?', 'Do you live with a person who is a senior citizen?']
       },
-      SURVEY_QUESTIONS_INSTRUCTIONS: {
-          'houseHoldQuantity': quantitative_instruction,
-          'hasInfants': affirmative_instruction,
-          'hasElderly': affirmative_instruction,
-      },
-      SURVEY_COMPLETE_MESSAGE: '',
-      NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters.<break time=".5s"/> First answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> How many people are in your household?',
+      SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
+      SURVEY_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list. Congratulations! <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Thank you for using the Disaster Ready Skill.',
+      NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters.<break time=".5s"/> First answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
       RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE: [
-          'Welcome back to the %s skill. Let\'s pick up where we left off. You have %s %s remaining. Please answer the following %s. <break time=".8s"/> %s'
+          'Welcome back to the %s skill. Let\'s pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.'
       ],
       RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE: [
-          'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your list you can say "get next item" or "get next"'
+          'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your %s list you can say "next item" or "next"'
       ],
+      START_PERMISSIONS_MISSING: 'Welcome to the %s skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
+      RESTART_SESSION_LAUNCH_MESSAGE: 'Okay, let\'s start over. I will walk you through building an emergency supply kit for disasters again. Let\'s go through the survey once more to consider the unique needs of your household. To begin say: start survey.',
+      PERMISSIONS_MISSING: 'Alexa List permissions are missing. You can grant permissions within the Alexa app.',
+      REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, you can say, "next" or "next item." Or review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
+      REVIEWED_ALL_ITEMS_REPROMPT: 'You can say "next" or "next item" to review the remaining items again. You can review all completed items by saying "review completed". Or to review all remaining items say "review items remaining."',
+      LIST_MISSING: 'I was unable to find your %s List. Please create a new list by saying "create new list."',
+      LIST_EXISTS: 'Thank you for answering my questions. It appears an %s list already exists. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list."',
+      LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create new list."',
+      LIST_STATE_NOT_READY: 'Sorry, you can not get any list items until the survey is complete.',
+      GOODBYE_MESSAGES: ['Thank you for using %s. Goodbye.', 'Thank you for using %s. See you later.', 'Thank you for using the %s skill. Toodles!', 'Goodbye! Remember to check in and use %s again soon!'],
+      HELP_MESSAGE_LIST_MISSING: 'Your %s list is missing. You can create a new list by saying "create new list."',
+      HELP_MESSAGE_LIST_ALREADY_EXISTS: 'A %s list exists already. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list." If you have already deleted the list simply say "create new list."',
+      HELP_MESSAGE_STATE_SURVEY: 'Answer the questions asked so that I can customize your %s list. You can resume the survey by saying continue.',
+      HELP_MESSAGE_STATE_LIST: 'To get the next item on your list. Simply say, "next" or "next item."',
+      HELP_MESSAGE_GENERAL: 'To get the next item on your list you can say "next" or "next item. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items."',
+      HELP_MESSAGE_STATE_COMPLETE: 'You have completed all items on your %s list. You can start over by saying restart. Or you can leave the skill by saying exit.',
+      HELP_MESSAGE_ALL_LIST_ITEMS_REVIEWED: 'You have reviewed all items on your %s list. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items." Or to start over at the top of your list say "next" or "next item."',
+      LIST_COMPLETE_MESSAGE_LAUNCH: 'Your %s list has been completed! Great job! You can start over by saying restart. Or leave the skill by saying exit.',
+      EXIT_MESSAGES: []
     },
   },
   'en-US': {
@@ -106,13 +119,57 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   async handle(handlerInput) {
+
     //grabbing global
     const attributesManager = handlerInput.attributesManager;
     const requestAttributes = attributesManager.getRequestAttributes();
     const surveyQuestions = requestAttributes.t('SURVEY_QUESTIONS');
 
+    //permission checks
+    const permissionCheck = await hasListPermission(handlerInput);
+    if(!permissionCheck){
+        const permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
+        let speechText = requestAttributes.t('START_PERMISSIONS_MISSING', requestAttributes.t('SKILL_NAME'));
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withAskForPermissionsConsentCard(permissions)
+            .getResponse();
+    }
+
     //getting persistent attributes from the database
     const attributes = await attributesManager.getPersistentAttributes() || {};
+    const list_name = requestAttributes.t('LIST_NAME');
+
+    //sanity checks
+    if(attributes.sessionState === 'COMPLETE'){
+      attributesManager.setSessionAttributes(attributes);
+      attributesManager.setPersistentAttributes(attributes);
+      let speechText = requestAttributes.t('LIST_COMPLETE_MESSAGE_LAUNCH', list_name);
+      return handlerInput.responseBuilder
+          .speak(speechText)
+          .withShouldEndSession(false)
+          .getResponse()
+    }
+
+    if(attributes.listExists){
+        attributesManager.setSessionAttributes(attributes);
+        attributesManager.setPersistentAttributes(attributes);
+        let speechText = requestAttributes.t('LIST_EXISTS_LAUNCH', list_name);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withShouldEndSession(false)
+            .getResponse()
+    }
+
+    if(attributes.listMissing){
+        attributesManager.setSessionAttributes(attributes);
+        attributesManager.setPersistentAttributes(attributes);
+        let speechText = requestAttributes.t('LIST_MISSING', list_name);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withShouldEndSession(false)
+            .getResponse()
+    }
 
     //setting up speech text and card text
     let speechText = '';
@@ -120,24 +177,32 @@ const LaunchRequestHandler = {
     let questionsRemaining = surveyQuestions.length;
 
     //determining welcome message based on user experience with skill thus far
-    if (Object.keys(attributes).length === 0) {
+    if (Object.keys(attributes).length === 0 || Object.keys(attributes).length === 1) {
         attributes.sessionState = 'SURVEY';  //SESSION STATES [SURVEY, LIST, COMPLETE]
         attributes.listID = '';
         attributes.lastListItemID = null;
+        attributes.listExists = false;
+        attributes.listMissing = false;
+        attributes.hasReviedAllItems = false;
         attributes.list_items_ids = {};
         speechText = requestAttributes.t('NEW_SESSION_MESSAGE', requestAttributes.t('SKILL_NAME'), surveyQuestions.length)+'<break time=".5s"/> ';
-        card_text = stripTags(speechText);
+
+        if(attributes.hasOwnProperty('is_restarted')){
+            if(attributes.is_restarted === true){
+                attributes.is_restarted = false;
+                speechText = requestAttributes.t('RESTART_SESSION_LAUNCH_MESSAGE');
+            }
+        }
+
     }else{
         const temp_survey_intent = attributes.temp_SurveyIntent;
         questionsRemaining = countEmptyFields(temp_survey_intent);
         if(questionsRemaining > 0){
             let nextSurveyQuestion = getNextListItem(questionsRemaining, surveyQuestions);
             let question_text = (questionsRemaining == 1) ? 'question' : 'questions';
-            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE', requestAttributes.t('SKILL_NAME'), questionsRemaining, question_text, question_text, nextSurveyQuestion));
-            card_text = stripTags(speechText);
+            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE', requestAttributes.t('SKILL_NAME'), questionsRemaining, question_text, question_text));
         }else{
-            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE', requestAttributes.t('SKILL_NAME')));
-            card_text = stripTags(speechText);
+            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE', requestAttributes.t('SKILL_NAME'), requestAttributes.t('LIST_NAME')));
         }
     }
 
@@ -146,23 +211,22 @@ const LaunchRequestHandler = {
     attributesManager.setPersistentAttributes(attributes);
     await attributesManager.savePersistentAttributes();
 
+    card_text = stripTags(speechText);
     let repromptText = '';
     if(questionsRemaining > 0){
-        let init_slot = getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
-        repromptText = getRandomArrayItem(requestAttributes.t('SURVEY_QUESTIONS_REPROMPTS')[init_slot]);
-
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(repromptText)
             .getResponse();
     }else{
-        let repromptText = 'You can say get next item or get next';
+        repromptText = 'You can say next item or next';
     }
 
-      return handlerInput.responseBuilder.speak(speechText)
-          .reprompt(repromptText)
-          .withSimpleCard('Welcome', card_text)
-          .getResponse();
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(repromptText)
+      .withSimpleCard('Welcome', card_text)
+      .getResponse();
 
   },
 };
@@ -184,6 +248,7 @@ const InProgressSurveyHandler = {
         let current_attributes = await attributesManager.getPersistentAttributes() || {};
 
         let updatedIntent = request.intent;
+
         let disambiguate_slot_response = null;
         let at_state_end = true;
 
@@ -217,13 +282,13 @@ const InProgressSurveyHandler = {
         console.log('in dialogState: ', request.dialogState);
 
         //handle promise update session values
-        disambiguate_slot_response = disambiguateSlot(handlerInput);
+        disambiguate_slot_response = await disambiguateSlot(handlerInput);
+        console.log("disambiguate_slot_response:", disambiguate_slot_response);
         if(disambiguate_slot_response !== true){
             let current_slot = disambiguate_slot_response.slot;
             let repromptQuestionText = getRandomArrayItem(requestAttributes.t('SURVEY_QUESTIONS_REPROMPTS')[current_slot]);
-            let repromptInstructionText = requestAttributes.t('SURVEY_QUESTIONS_INSTRUCTIONS')[current_slot];
+            let repromptInstructionText = requestAttributes.t('SURVEY_QUESTIONS_INSTRUCTIONS');
             let repromptText = getRandomArrayItem(requestAttributes.t('SURVEY_QUESTIONS_REPROMPTS_PREFACES', repromptQuestionText, repromptInstructionText));
-
             return handlerInput.responseBuilder
                 .addElicitSlotDirective(current_slot , disambiguate_slot_response.intent)
                 .speak(repromptText)
@@ -254,46 +319,82 @@ const CompletedSurveyHandler = {
         const requestAttributes = attributesManager.getRequestAttributes();
         let current_attributes = await attributesManager.getPersistentAttributes();
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
+        let list_recreated = false;
+        if(current_attributes.listExists == true || current_attributes.listMissing == true){
+            list_recreated = true;
+        }
+
         current_attributes.sessionState = 'LIST';
         handlerInput.attributesManager.setPersistentAttributes(current_attributes);
         handlerInput.attributesManager.setSessionAttributes(current_attributes);
 
-        return new Promise((resolve, reject) => {
-            createNewList(requestAttributes.t('LIST_NAME'), handlerInput).then(async (response) => {
-                if(response.statusCode == 201){ //success
-                    current_attributes.listID = response.listId;
-                    let list_id = response.listId;
-                    let slot_list = getActiveSlots(current_attributes.temp_SurveyIntent);
-                    let emergency_kit_list = getListItemsByType(slot_list, disaster_kit_list);
-                    for(let list_item of emergency_kit_list){
-                        addListItem(list_id, list_item.name, handlerInput, async function(status, response_Data){
-                            let list_item_id = response_Data.id;
-                            let disaster_kit_id = list_item.id;
-                            current_attributes.list_items_ids[list_item_id] = {'id': disaster_kit_id, 'list_id':list_item_id, 'status': 1, 'is_reviewed': false};
-                            handlerInput.attributesManager.setSessionAttributes(current_attributes);
-                            handlerInput.attributesManager.setPersistentAttributes(current_attributes);
-                            await handlerInput.attributesManager.savePersistentAttributes();
-                        });
-                    }
-                }else{
-                    //TODO write list failure
-                }
-            }).then(function(){
+        const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
 
-                console.log('attribute inside promise', current_attributes);
+        const list_request = {
+            'name': requestAttributes.t('LIST_NAME'),
+            'state': listStatuses.ACTIVE
+        };
 
-                let speechOutput = 'Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/>';
-                speechOutput += 'To get the next item on your list you can say \"get next item\" or \"get next\"';
-
-                const responseBuilder = handlerInput.responseBuilder;
-
-                resolve(responseBuilder
-                    .withShouldEndSession(false)
-                    .speak(speechOutput)
-                    .getResponse());
-            });
+        await listClient.createList(list_request).then(async function(create_list_response) {
+            current_attributes.listID = create_list_response.listId;
+            current_attributes.listExists = false;
+            current_attributes.listMissing = false;
+            let list_id = create_list_response.listId;
+            let slot_list = getActiveSlots(current_attributes.temp_SurveyIntent);
+            let emergency_kit_list = getListItemsByType(slot_list, disaster_kit_list);
+            for(let list_item of emergency_kit_list){
+                const list_item_create_request = {
+                    'value': list_item.name,
+                    'status': listStatuses.ACTIVE
+                };
+                await listClient.createListItem(list_id, list_item_create_request).then(async function(response){
+                    let list_item_id = response.id;
+                    let disaster_kit_id = list_item.id;
+                    current_attributes.list_items_ids[list_item_id] = {'id': disaster_kit_id, 'list_id':list_item_id, 'status': 1, 'is_reviewed': false};
+                    handlerInput.attributesManager.setSessionAttributes(current_attributes);
+                    handlerInput.attributesManager.setPersistentAttributes(current_attributes);
+                    await handlerInput.attributesManager.savePersistentAttributes();
+                });
+            }
         });
+
+        let speechOutput = 'Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/> ';
+        if(list_recreated){
+            speechOutput = " I\'ve created a brand new emergency supply kit list for you. ";
+        }
+        speechOutput += 'To get the first item on your list you can say \"next item\" or \"next\"';
+
+        const responseBuilder = handlerInput.responseBuilder;
+
+        return responseBuilder
+            .withShouldEndSession(false)
+            .speak(speechOutput)
+            .getResponse();
+
     },
+};
+
+const CreateNewListIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'CreateNewListIntent';
+    },
+    handle(handlerInput) {
+        return CompletedSurveyHandler.handle(handlerInput);
+    }
+};
+const RestartIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'RestartIntent';
+    },
+    async handle(handlerInput) {
+        const attributes = {is_restarted:true};
+        const attributeManager = handlerInput.attributesManager;
+        attributeManager.setPersistentAttributes(attributes);
+        await attributeManager.savePersistentAttributes()
+        return LaunchRequestHandler.handle(handlerInput);
+    }
 };
 
 const NextItemIntentHandler = {
@@ -302,182 +403,154 @@ const NextItemIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'NextItemIntent';
   },
   async handle(handlerInput) {
-    let speechText = '';
-    let  repromptText = '';
+    console.log("Next item intent");
+    let speechText, repromptText;
     const attributesManager = handlerInput.attributesManager;
+    const requestAttributes = attributesManager.getRequestAttributes();
     let sessionAttributes =  await attributesManager.getPersistentAttributes() || {};
     let list_items_ids = sessionAttributes.list_items_ids;
-    const system = handlerInput.requestEnvelope.context.System;
-    let consent_token = system.apiAccessToken;
     let current_list_id = sessionAttributes.listID;
     const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
-    let items = [];
 
-    //TODO add reprompts
-    if(!handlerInput.requestEnvelope.context.System.user.permissions) {
-      console.log("permissions are not defined");
-        let permissions = ["alexa::household:lists:read", "alexa::household:lists:write"];
-        speechText = "Alexa List permissions are missing. You can grant permissions within the Alexa app.";
+    console.log("Starting get todo list call.", sessionAttributes);
+
+    //sanity check: is it appropriate to start giving items
+    if(sessionAttributes.sessionState === 'SURVEY'){
+        speechText = requestAttributes.t('LIST_STATE_NOT_READY');
         return handlerInput.responseBuilder
+            .withShouldEndSession(true)
             .speak(speechText)
-            .withAskForPermissionsConsentCard(permissions)
             .getResponse();
     }
 
-    console.log("Starting get todo list call.");
+    if(sessionAttributes.hasReviedAllItems === true){
+        const new_list_ids = resetReviewedItems(sessionAttributes.list_items_ids);
+        sessionAttributes.list_items_ids = new_list_ids;
+        sessionAttributes.hasReviedAllItems = false;
+        attributesManager.setSessionAttributes(sessionAttributes);
+        attributesManager.setPersistentAttributes(sessionAttributes);
+        console.log('new list item ids', new_list_ids);
+    }
 
-    let todo_path = '/v2/householdlists/'+current_list_id+'/active';
+    //getting to do items
+    const items = await getToDoItems(handlerInput, current_list_id);
+    if(!items) {
+          let  permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
+          speechText = requestAttributes.t('PERMISSIONS_MISSING');
 
-    let options = {
-      custom: {'handler': handlerInput},
-      host: api_url,
-      port: api_port,
-      path: todo_path,
-      method: 'GET',
-      headers: {
-          'Authorization': 'Bearer ' + consent_token,
-          'Content-Type': 'application/json'
+          return handlerInput.responseBuilder
+              .speak(speechText)
+              .withAskForPermissionsConsentCard(permissions)
+              .getResponse();
+
+    }
+    else if(items === list_is_empty){
+        speechText = requestAttributes.t('SURVEY_COMPLETE_MESSAGE');
+        sessionAttributes.sessionState = 'COMPLETE';
+        attributesManager.setSessionAttributes(sessionAttributes);
+        attributesManager.setPersistentAttributes(sessionAttributes);
+        await attributesManager.savePersistentAttributes();
+
+        return handlerInput.responseBuilder
+              .speak(speechText)
+              .withShouldEndSession(true)
+              .getResponse();
+    }
+    else{
+          let current_list_item = null;
+          for(let i = 0;  i < items.length; i++){
+              let list_item_skill_id = items[i].id;
+              if(list_items_ids.hasOwnProperty(list_item_skill_id)){
+                  if(list_items_ids[list_item_skill_id].is_reviewed === false){
+                      sessionAttributes.list_items_ids[list_item_skill_id].is_reviewed = true;
+                      sessionAttributes.lastListItemID = list_item_skill_id;
+                      current_list_item = items[i];
+                      attributesManager.setSessionAttributes(sessionAttributes);
+                      attributesManager.setPersistentAttributes(sessionAttributes);
+                      await attributesManager.savePersistentAttributes();
+                      break;
+                  }
+              }
+          }
+          if(current_list_item == null){ //not in the list
+              for(let i = 0;  i < items.length; i++){
+                  let list_item_skill_id = items[i].id;
+                  if(!list_items_ids.hasOwnProperty(list_item_skill_id)){ //custom list item
+                      current_list_item = items[i];
+                      break;
+                  }else{//keys found
+                      if(list_items_ids[list_item_skill_id].is_reviewed === false){
+                          current_list_item = items[i];
+                          break;
+                      }
+                  }
+              }
+
+              let cur_session_attrs = attributesManager.getSessionAttributes();
+              //TODO case where current_list_item!= null and is not a custom item
+              if(current_list_item !== null){
+                  speechText = "The next item on your list is "+current_list_item.value + ". You added this item to your Emergency Supply Kit list.";
+                  repromptText = "The next item on your list is "+current_list_item.value;
+                  cur_session_attrs.list_items_ids[current_list_item.id] = {'name': current_list_item.value, 'type': 'custom', 'is_reviewed': true}
+              }else{
+                  cur_session_attrs.hasReviedAllItems = true;
+                  let list_name = requestAttributes.t('LIST_NAME');
+                  speechText = requestAttributes.t('REVIEWED_ALL_ITEMS_SPEECH', list_name);
+                  repromptText = requestAttributes.t('REVIEWED_ALL_ITEMS_REPROMPT');
+              }
+
+              attributesManager.setSessionAttributes(cur_session_attrs);
+              attributesManager.setPersistentAttributes(cur_session_attrs);
+              await attributesManager.savePersistentAttributes();
+
+              return handlerInput.responseBuilder
+                  .speak(speechText)
+                  .reprompt(repromptText)
+                  .withShouldEndSession(false)
+                  .getResponse();
+          }
+          else{
+              if(list_items_ids.hasOwnProperty(current_list_item.id)){
+                  if(list_items_ids[current_list_item.id].hasOwnProperty('type')){
+                      speechText = "The next item on your list is "+current_list_item.value + ". You added this item to your Emergency Supply Kit list.";
+                      repromptText = "The next item on your list is "+current_list_item.value;;
+                  }else{
+                      let nextItem = getListItemsByInternalID(list_items_ids[current_list_item.id].id, disaster_kit_list);
+                      nextItem = nextItem[0];
+
+                      if(nextItem.hasOwnProperty('use_a')){
+                          speechText = "The next item is a " + current_list_item.value +". "+nextItem.short_description;
+                          repromptText = "The next item is a " + current_list_item.value+".";
+                      }else{
+                          speechText = "The next item is " + current_list_item.value +". "+nextItem.short_description;
+                          repromptText = "The next item is " + current_list_item.value+".";
+                      }
+
+                      if(nextItem.hasOwnProperty('image_small')){
+                          return handlerInput.responseBuilder
+                              .speak(speechText)
+                              .reprompt(speechText)
+                              .withShouldEndSession(false)
+                              .withStandardCard(nextItem.name, nextItem.full_description, nextItem.image_small, nextItem.image_large)
+                              .getResponse();
+                      }else{
+                          return handlerInput.responseBuilder
+                              .speak(speechText)
+                              .reprompt(speechText)
+                              .withShouldEndSession(false)
+                              .withSimpleCard(nextItem.name, nextItem.full_description)
+                              .getResponse();
+                      }
+                  }
+              }
+
+              return handlerInput.responseBuilder
+                  .speak(speechText)
+                  .reprompt(repromptText)
+                  .withShouldEndSession(false)
+                  .getResponse();
+          }
       }
-    };
-
-    return new Promise((resolve, reject) => {
-        httpGet(options).then(async (response) => {
-            items = response.items;
-            if(!items) {
-                let  permissions = ["alexa::household:lists:read", "alexa::household:lists:write"];
-                speechText = "Alexa List permissions are missing. You can grant permissions within the Alexa app.";
-
-                resolve(handlerInput.responseBuilder
-                    .speak(speechText)
-                    .withAskForPermissionsConsentCard(permissions)
-                    .getResponse());
-
-            }else if(items === list_is_empty){
-                speechText = "Your list is empty. You have no items on your Emergency Supply Kit list.";
-                repromptText = "You have no items on your Emergency Supply Kit list.";
-                //TODO add instructions on how to proceed
-                resolve(handlerInput.responseBuilder
-                    .speak(speechText)
-                    .withShouldEndSession(false)
-                    .getResponse());
-            }else{
-                let current_list_item = null;
-                for(let i = 0;  i < items.length; i++){
-                    let list_item_skill_id = items[i].id;
-                    if(list_items_ids.hasOwnProperty(list_item_skill_id)){
-                        if(list_items_ids[list_item_skill_id].is_reviewed === false){
-                            sessionAttributes.list_items_ids[list_item_skill_id].is_reviewed = true;
-                            sessionAttributes.lastListItemID = list_item_skill_id;
-                            current_list_item = items[i];
-                            attributesManager.setSessionAttributes(sessionAttributes);
-                            attributesManager.setPersistentAttributes(sessionAttributes);
-                            await attributesManager.savePersistentAttributes();
-                            break;
-                        }
-                    }
-                }
-
-                if(items.length === 0){
-                    //TODO return statement
-                    console.log('item length is zero');
-                    speechText = "There are no more items on your emergency supply kit list.";
-                    repromptText = "You have completed your emergency supply kit list! All items have been checked off.";
-                }
-                else if(current_list_item == null){ //not in the list
-                    for(let i = 0;  i < items.length; i++){
-                        let list_item_skill_id = items[i].id;
-                        if(!list_items_ids.hasOwnProperty(list_item_skill_id)){ //custom list item
-                            current_list_item = items[i];
-                            break;
-                        }else{//keys found
-                            if(list_items_ids[list_item_skill_id].is_reviewed === false){
-                                current_list_item = items[i];
-                                break;
-                            }
-                        }
-                    }
-                    //TODO case where current_list_item!= null and is not a custom item
-                    if(current_list_item !== null){
-                        speechText = "The next item on your list is "+current_list_item.value + ". You added this item to your Emergency Supply Kit list.";
-                        repromptText = "The next item on your list is "+current_list_item.value;
-                        let cur_session_attrs = attributesManager.getSessionAttributes();
-                        cur_session_attrs.list_items_ids[current_list_item.id] = {'name': current_list_item.value, 'type': 'custom', 'is_reviewed': true}
-                        attributesManager.setSessionAttributes(cur_session_attrs);
-                        attributesManager.setPersistentAttributes(cur_session_attrs);
-                        await attributesManager.savePersistentAttributes();
-                    }else{
-                        //TODO add case where we review each item again
-                        // to start at the beginning of your list again say "reset"
-                        // to get the items remaining on your list you can say "get all remaining items"
-                        // to review the items you have checked off on the list say "review completed items"
-                        speechText = "We have reviewed all items on your emergency supply kit list.";
-                        repromptText = "We have reviewed all items on your emergency supply kit list.";
-                    }
-
-                    resolve(handlerInput.responseBuilder
-                        .speak(speechText)
-                        .reprompt(repromptText)
-                        .withShouldEndSession(false)
-                        .getResponse());
-                }
-                else{
-                    if(list_items_ids.hasOwnProperty(current_list_item.id)){
-                        if(list_items_ids[current_list_item.id].hasOwnProperty('type')){
-                            speechText = "The next item on your list is "+current_list_item.value + ". You added this item to your Emergency Supply Kit list.";
-                            repromptText = "The next item on your list is "+current_list_item.value;;
-                        }else{
-                            let nextItem = getListItemsByInternalID(list_items_ids[current_list_item.id].id, disaster_kit_list);
-                            console.log('next item before::', nextItem);
-                            nextItem = nextItem[0];
-                            console.log('current_list_item::', current_list_item.id);
-                            console.log('list_items_ids::', list_items_ids);
-                            console.log('next item::', nextItem);
-
-                            if(nextItem.hasOwnProperty('use_a')){
-                                speechText = "The next item is a " + current_list_item.value +". "+nextItem.short_description;
-                                repromptText = "The next item is a " + current_list_item.value+".";
-                            }else{
-                                speechText = "The next item is " + current_list_item.value +". "+nextItem.short_description;
-                                repromptText = "The next item is " + current_list_item.value+".";
-                            }
-
-                            if(nextItem.hasOwnProperty('image_small')){
-                                resolve(handlerInput.responseBuilder
-                                    .speak(speechText)
-                                    .reprompt(speechText)
-                                    .withShouldEndSession(false)
-                                    .withStandardCard(nextItem.name, nextItem.full_description, nextItem.image_small, nextItem.image_large)
-                                    .getResponse());
-                            }else{
-                                resolve(handlerInput.responseBuilder
-                                    .speak(speechText)
-                                    .reprompt(speechText)
-                                    .withShouldEndSession(false)
-                                    .withSimpleCard(nextItem.name, nextItem.full_description)
-                                    .getResponse());
-                            }
-                        }
-                    }
-
-                    resolve(handlerInput.responseBuilder
-                        .speak(speechText)
-                        .reprompt(repromptText)
-                        .withShouldEndSession(false)
-                        .getResponse());
-                }
-            }
-
-            resolve(handlerInput.responseBuilder
-                .speak(speechText)
-                .reprompt(speechText)
-                .withShouldEndSession(false)
-                .getResponse());
-
-        }).catch((error) => {
-            console.log(error);
-        });
-    });
-
   },
 };
 
@@ -487,12 +560,35 @@ const HelpIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speechText = 'You can say hello to me!';
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const session_attributes = handlerInput.attributesManager.getSessionAttributes();
+    const sessionState = session_attributes.sessionState;
+    const list_name = requestAttributes.t('LIST_NAME');
+    let speechText = '';
+    let repromptText = '';
+    if(session_attributes.listExists === true){
+        speechText = requestAttributes.t('HELP_MESSAGE_LIST_ALREADY_EXISTS', list_name);
+    }else if(session_attributes.listMissing  === true){
+        speechText = requestAttributes.t('HELP_MESSAGE_LIST_MISSING', list_name);
+    }else if(session_attributes.hasReviedAllItems === true){
+        speechText = requestAttributes.t('HELP_MESSAGE_ALL_LIST_ITEMS_REVIEWED', list_name);
+    }else{
+        if(sessionState === 'SURVEY'){
+            speechText = requestAttributes.t('HELP_MESSAGE_STATE_SURVEY', list_name);
+        }else if(sessionState === 'LIST'){
+            speechText = requestAttributes.t('HELP_MESSAGE_STATE_LIST');
+        }else if(sessionState === 'COMPLETE'){
+            speechText = requestAttributes.t('HELP_MESSAGE_STATE_COMPLETE', list_name );
+        }else{
+            speechText = requestAttributes.t('HELP_MESSAGE_GENERAL');
+        }
+    }
 
+    let cardText = stripTags(speechText);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .reprompt(repromptText)
+      .withSimpleCard('Help', cardText)
       .getResponse();
   },
 };
@@ -504,232 +600,172 @@ const CancelAndStopIntentHandler = {
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speechText = 'Goodbye!';
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    let skill_name = requestAttributes.t('SKILL_NAME');
+    const speechText = getRandomArrayItem(requestAttributes.t('GOODBYE_MESSAGES', skill_name));
 
     return handlerInput.responseBuilder
+      .withShouldEndSession(true)
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
       .getResponse();
   },
 };
 
-const SessionEndedRequestHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
-  },
-  handle(handlerInput) {
-    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+const FallBackIntentHandler = {
+    canHandle(handlerInput) {
+        const request = handlerInput.requestEnvelope.request;
+        return request.type === 'IntentRequest'
+            && request.intent.name === 'AMAZON.FallbackIntent';
+    },
+    handle(handlerInput) {
+        console.log('In FallBackIntentHandler');
+        let session_attr = handlerInput.attributesManager.getSessionAttributes();
+        console.log(session_attr);
+        if(session_attr.sessionState === 'SURVEY'){
+            return handlerInput.responseBuilder
+                .speak('Sorry, I had trouble understanding what you said. You can resume the survey and answer the question again by saying continue.')
+                .getResponse();
+        }else{
+            return handlerInput.responseBuilder
+                .speak('Sorry, I had trouble doing what you asked.  Please ask for it again.')
+                .reprompt('Sorry, I had trouble doing what you asked.  Please ask for it again.')
+                .getResponse();
+        }
+    },
+};
 
-    return handlerInput.responseBuilder.getResponse();
-  },
+
+const UnhandledIntent = {
+    canHandle() {
+        return true;
+    },
+    handle(handlerInput) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        if(sessionAttributes.sessionState === 'SURVEY'){
+            const temp_survey_intent = sessionAttributes.temp_SurveyIntent;
+            let questionsRemaining = countEmptyFields(temp_survey_intent);
+            let init_slot = getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
+            let surveyQuestions = requestAttributes.t('SURVEY_QUESTIONS');
+            let speechText = "Sorry, I didn't get that. Please answer the question again. To resume the survey say: continue.";
+
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .withShouldEndSession(false)
+                .getResponse();
+        }
+
+        return handlerInput.responseBuilder
+            .speak("I didn't quite get that. Please repeat your request.")
+            .getResponse();
+    },
+};
+
+
+const SessionEndedRequestHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+    },
+    handle(handlerInput) {
+        console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+
+        return handlerInput.responseBuilder
+            .speak("Sorry, an error occurred. The skill will be closed out.")
+            .withShouldEndSession(true)
+            .getResponse();
+    },
 };
 
 const ErrorHandler = {
   canHandle() {
     return true;
   },
-  handle(handlerInput, error) {
-    console.log(`Error handled: ${error.message}`, error);
+  async handle(handlerInput, error) {
+      const request = handlerInput.requestEnvelope.request;
+      const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+      const session_attrs = handlerInput.attributesManager.getSessionAttributes();
+      console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
+      console.log(`Error handled: ${error}`);
+      console.log(error);
+      if(error.hasOwnProperty('response')){
+          if(error.response.message === 'List id does not exists.'){
+                  session_attrs.listMissing = true;
+                  await handlerInput.attributesManager.setSessionAttributes(session_attrs);
+                  await handlerInput.attributesManager.setPersistentAttributes(session_attrs);
+                  await handlerInput.attributesManager.savePersistentAttributes();
+                  return handlerInput.responseBuilder
+                  .withShouldEndSession(false)
+                  .speak(requestAttributes.t('LIST_MISSING', requestAttributes.t('LIST_NAME')))
+                  .getResponse();
+          }
+          else if(error.response.message === 'List name already exists.'){
+              session_attrs.listExists = true;
+              await handlerInput.attributesManager.setSessionAttributes(session_attrs);
+              await handlerInput.attributesManager.setPersistentAttributes(session_attrs);
+              await handlerInput.attributesManager.savePersistentAttributes();
+              return handlerInput.responseBuilder
+                  .withShouldEndSession(true)
+                  .speak(requestAttributes.t('LIST_EXISTS', requestAttributes.t('LIST_NAME')))
+                  .getResponse();
+          }
+      }
 
-    return handlerInput.responseBuilder
-      .speak('Sorry, I can\'t understand the command. Please say again.')
-      .reprompt('Sorry, I can\'t understand the command. Please say again.')
-      .getResponse();
+      return handlerInput.responseBuilder
+          .speak('Sorry, I had trouble doing what you asked.  Please ask for it again.')
+          .reprompt('Sorry, I had trouble doing what you asked.  Please ask for it again.')
+          .getResponse();
   },
 };
 
-/*
- *  List Helper Functions
- */
-const createNewList = function(list_name, handlerInput) { //addNewListAction, 201 = success, 409 = already created
-    console.log("prepare New List API call");
-
-    const system = handlerInput.requestEnvelope.context.System;
-
-    const path = "/v2/householdlists/";
-
-    console.log("path:" + path);
-
-    const postData = {
-        "name": list_name, //item value, with a string description up to 256 characters
-        "state": "active" // item status (Enum: "active" only)
-    };
-
-    const consent_token = system.apiAccessToken;
-
-    const options = {
-        host: api_url,
-        port: api_port,
-        path: path,
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + consent_token,
-            'Content-Type': 'application/json'
-        }
-    };
-    return new Promise(((resolve, reject) => {
-        const req = https.request(options, (res) => {
-            console.log('statusCode:', res.statusCode);
-            console.log('headers:', res.headers);
-            let data = "";
-
-            res.on('data', (d) => {
-                console.log("data received:" + d);
-                data += d;
-            });
-            res.on('error', (e) => {
-                console.log("error received");
-                console.error(e);
-                reject(e);
-            });
-            res.on('end', function() {
-                console.log("ending post request");
-                if (res.statusCode === 201) {
-                    let responseMsg = eval('(' + data + ')');
-                    responseMsg.statusCode = res.statusCode;
-                    resolve(responseMsg);
-                } else {
-                    resolve(res.statusCode);
-                }
-            });
-        });
-
-        req.end(JSON.stringify(postData));
-    }));
-};
-
-
 /**
- * Add List Item API to retrieve the customer to-do list.
+ * Check List Permissions
  */
-/**
- * Add List Item API to retrieve the customer to-do list.
- */
-const addListItem = async function(listId, listItemName, handlerInput, callback) {
-    console.log("prepare API call to add item to list");
+async function hasListPermission(handlerInput){
+    if(!handlerInput.requestEnvelope.context.System.user.permissions) {
+        return false;
+    }
+    return true;
+}
 
-    const system = handlerInput.requestEnvelope.context.System;
-    let consent_token = system.apiAccessToken;
-
-    let path = "/v2/householdlists/_listId_/items";
-    path = path.replace("_listId_", listId);
-
-    console.log("path:" + path);
-
-    let postData = {
-        "value": listItemName, //item value, with a string description up to 256 characters
-        "status": "active" // item status (Enum: "active" or "completed")
-    };
-
-    let options = {
-        host: api_url,
-        port: api_port,
-        path: path,
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + consent_token,
-            'Content-Type': 'application/json'
-        }
-    };
-
-    let req = https.request(options, (res) => {
-        console.log('statusCode:', res.statusCode);
-        console.log('headers:', res.headers);
-        let data = "";
-        res.on('data', (d) => {
-            console.log("data: " + d);
-            data += d;
-            //    process.stdout.write(d);
-        });
-        res.on('error', (e) => {
-            console.log("error received");
-            console.error(e);
-        });
-        res.on('end', function() {
-            let responseMsg = eval('(' + data + ')');
-            console.log('data from add list item:', responseMsg);
-            callback(res.statusCode, responseMsg);
-            return;
-        });
-    }).end(JSON.stringify(postData));
-
-    return new Promise(function(resolve, reject) {
-        resolve(postData);
-    });
-};
 /**
  * Helper function to retrieve the top to-do item.
  */
-const getAllListItems = function(handlerInput, callback) {
-    return new Promise(function(resolve, reject) {
-        getToDoList(handlerInput, function(handlerInput, returnValue) {
-            if(!returnValue) {
-                callback(null);
-                reject(null);
-            }
-            else if(!returnValue.items || returnValue.items.length === 0) {
-                callback(handlerInput, list_is_empty);
-                resolve(list_is_empty);
-            }
-            else {
-                callback(handlerInput, returnValue.items);
-                resolve(returnValue.items);
-            }
-        });
-    });
-};
+async function getToDoItems(handlerInput, listId) {
+    const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
 
-function httpGet(options) {
-    return new Promise(((resolve, reject) => {
-
-        const request = https.request(options, (response) => {
-            response.setEncoding('utf8');
-            let returnData = '';
-
-            if((response.statusCode < 200 || response.statusCode >= 300) && response.statusCode !== 403) {
-                return reject(new Error(`${response.statusCode}`));
-            }
-
-            if(response.statusCode === 403) {
-                resolve(null);
-                console.log("permissions are not granted");
-            }
-
-            response.on('data', (chunk) => {
-                returnData += chunk;
-            });
-
-            response.on('end', () => {
-                resolve(JSON.parse(returnData));
-            });
-
-            response.on('error', (error) => {
-                reject(error);
-            });
-        });
-
-        request.on('error', function (error) {
-            reject(error);
-        });
-
-        request.end();
-    }));
+    console.log(`listid: ${listId}`);
+    const list = await listClient.getList(listId, listStatuses.ACTIVE);
+    if (!list) {
+        console.log('null list');
+        return null;
+    } else if (!list.items || list.items.length === 0) {
+        console.log('empty list');
+        return list_is_empty;
+    }
+    console.log(`list items found: ${list.items} with first id: ${list.items[0].id}`);
+    return list.items;
 }
 
-/*
- *  General Helper Functions
- */
-const disambiguateSlot = (handlerInput) => {
+
+/**
+*  General Helper Functions
+*/
+const disambiguateSlot = async (handlerInput) => {
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     let currentRequest = handlerInput.requestEnvelope.request;
     let currentIntent = currentRequest.intent;
+    console.log('current slots', currentIntent);
     let has_error = false;
     let error_response = {};
+    let has_defined_values = false;
 
+    console.log(currentIntent.slots);
     Object.keys(currentIntent.slots).forEach(function(slotName) {
         let currentSlot = currentIntent.slots[slotName];
-        // console.log('** current slot name', currentSlot);
-        // let slotValue = slotHasValue(currentRequest, currentSlot.name);
-        // console.log('** slot value', slotValue);
+        if(typeof currentSlot.value != 'undefined'){
+            has_defined_values = true;
+        }
         if (currentSlot.confirmationStatus !== 'CONFIRMED' &&
             currentSlot.resolutions &&
             currentSlot.resolutions.resolutionsPerAuthority[0]) {
@@ -743,45 +779,21 @@ const disambiguateSlot = (handlerInput) => {
             }
         }
     }, handlerInput);
-
     if(has_error){
         return error_response;
     }
     return true;
 }
-const slotHasValue = (request, slotName) => {
 
-    let slot = request.intent.slots[slotName];
-
-    //uncomment if you want to see the request
-    //console.log("request = "+JSON.stringify(request));
-    let slotValue;
-
-    //if we have a slot, get the text and store it into speechOutput
-    if (slot && slot.value) {
-        //we have a value in the slot
-        slotValue = slot.value.toLowerCase();
-        return slotValue;
-    } else {
-        //we didn't get a value in the slot.
-        return false;
+const resetReviewedItems = (obj_listitems) => {
+    for(const key of Object.keys(obj_listitems)){
+        let current_item = obj_listitems[key];
+        current_item.is_reviewed = false;
+        obj_listitems[key] = current_item;
     }
+    return obj_listitems;
 }
-const isSlotValid = (request, slotName) => {
-    var slot = request.intent.slots[slotName];
-    //console.log("request = "+JSON.stringify(request)); //uncomment if you want to see the request
-    var slotValue;
 
-    //if we have a slot, get the text and store it into speechOutput
-    if (slot && slot.value) {
-        //we have a value in the slot
-        slotValue = slot.value.toLowerCase();
-        return slotValue;
-    } else {
-        //we didn't get a value in the slot.
-        return false;
-    }
-}
 const getRandomArrayItem = (myArray) => {
     return myArray[Math.floor(Math.random()*myArray.length)]
 }
@@ -831,38 +843,6 @@ const getActiveSlots = (intent) => {
     return active_slots;
 }
 
-const getActiveAndUnreviewedListId = (list_ids_obj, handlerInput) => {
-    let return_id = null;
-    console.log('list length', list_ids_obj.length);
-    for(let i = 0; i < list_ids_obj.length; i++){
-        console.log('listy list', list_ids_obj[i]);
-        if(list_ids_obj[i].is_reviewed === false) {
-            list_ids_obj[i].is_reviewed = true;
-            return_id = list_ids_obj[i].id;
-            break;
-        }
-    }
-    let session_attr = handlerInput.attributesManager.getSessionAttributes();
-    session_attr.list_items_ids = list_ids_obj;
-    if(return_id !== null){
-        session_attr.lastListItemID = return_id;
-    }
-    handlerInput.attributesManager.setPersistentAttributes(session_attr);
-    handlerInput.attributesManager.setSessionAttributes(session_attr);
-
-    return return_id;
-}
-const updateListItemToReviewed = (list_id, list) =>{
-    for(let i = 0; list.length; i++){
-        if(list.id == list_id){
-            list[i].is_reviewed = true;
-        }
-    }
-    return list;
-}
-const getHouseholdCount = (intent) => {
-    return intent.slots.houseHoldQuantity.value;
-}
 const getDisasterKitItems = (disaster_list_items, locale) =>{
     if(disaster_list_items.hasOwnProperty(locale)){
         return disaster_list_items.locale;
@@ -881,13 +861,18 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
     NextItemIntentHandler,
+    RestartIntentHandler,
+    CreateNewListIntentHandler,
     HelpIntentHandler,
     InProgressSurveyHandler,
     CompletedSurveyHandler,
     CancelAndStopIntentHandler,
-    SessionEndedRequestHandler
+    FallBackIntentHandler,
+    SessionEndedRequestHandler,
+    UnhandledIntent,
   )
   .withPersistenceAdapter(dynamoDbPersistenceAdapter)
   .addRequestInterceptors(LocalizationInterceptor)
   .addErrorHandlers(ErrorHandler)
+  .withApiClient(new Alexa.DefaultApiClient())
   .lambda();
