@@ -81,8 +81,13 @@ const languageString = {
       LIST_COMPLETE_MESSAGE_LAUNCH: 'Your %s list has been completed! Great job! You can start over by saying restart. Or leave the skill by saying exit.',
       MORE_INFO_NOT_AVAILABLE: 'Sorry. Unfortunately, I do not have more information on this particular item. To get the next item on the list say: next or next item. To repeat the last item given, say: repeat.',
       MORE_INFO_INVALID: 'You can\'t ask for more information at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
-      REPEAT_INVALID: 'You can can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
+      REPEAT_INVALID: 'You can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
+      GET_COMPLETED_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review your completed items on your list. Resume your survey by saying: continue.',
       LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item no longer exists. Get the next item on the list by saying: next or next item.',
+      COMPLETED_ITEMS_EMPTY_LIST: 'Your %s list is has no completed items.',
+      NO_COMPLETED_ITEMS: 'There are no completed items on your list.',
+      COMPLETED_ITEMS: 'The items completed on your %s list are: %s.',
+      COMPLETED_ITEM: 'There is only one item completed on your %s list, which is : %s',
       EXIT_MESSAGES: []
     },
   },
@@ -488,6 +493,61 @@ const RestartIntentHandler = {
     }
 };
 
+const GetCompletedItemsIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'GetCompletedItemsIntent';
+    },
+    async handle(handlerInput) {
+        const attributesManager = handlerInput.attributesManager;
+        const sessionAttribute = attributesManager.getSessionAttributes();
+        const requestAttribute = attributesManager.getRequestAttributes();
+        const list_name = requestAttribute.t('LIST_NAME');
+        const listId = sessionAttribute.listID;
+        let speechOutPut = requestAttribute.t('GET_COMPLETED_ITEMS_INVALID', list_name);
+        let card_text = stripTags(speechOutPut);
+        if(sessionAttribute.sessionState !== 'SURVEY'){
+            const items = await getToDoItems(handlerInput, listId, listStatuses.COMPLETED);
+            console.log('ITEMS RETRIWEVED ====>>', items);
+            if(!items) {
+                let  permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
+                speechOutPut = requestAttribute.t('PERMISSIONS_MISSING');
+
+                return handlerInput.responseBuilder
+                    .speak(speechOutPut)
+                    .withAskForPermissionsConsentCard(permissions)
+                    .getResponse();
+
+            }else if(items === list_is_empty){
+                speechOutPut = requestAttribute.t('COMPLETED_ITEMS_EMPTY_LIST', list_name);
+                card_text = stripTags(speechOutPut);
+            }else{
+                if(items.length === 0){
+                    speechOutPut = requestAttribute.t('NO_COMPLETED_ITEMS');
+                }else{
+                    let string_completed_items = getStringOfListItems(items);
+                    if(items.length > 1){
+                        speechOutPut = requestAttribute.t('COMPLETED_ITEMS', list_name, string_completed_items);
+                    }else{
+                        speechOutPut = requestAttribute.t('COMPLETED_ITEM', list_name, string_completed_items);
+                    }
+                }
+                card_text = stripTags(speechOutPut);
+            }
+
+            //TODO Instructions of what to do next? refer to what prompt use this intent
+            speechOutPut += ' <break time=".3s"/>What would you like to do next? If you are not sure, you can say: help.';
+        }
+
+        const responseBuilder = handlerInput.responseBuilder;
+        return responseBuilder
+            .withShouldEndSession(false)
+            .withSimpleCard('Completed List Items', card_text)
+            .speak(speechOutPut)
+            .getResponse();
+    }
+};
+
 const NextItemIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -525,7 +585,7 @@ const NextItemIntentHandler = {
     }
 
     //getting to do items
-    const items = await getToDoItems(handlerInput, current_list_id);
+    const items = await getToDoItems(handlerInput, current_list_id, listStatuses.ACTIVE);
     if(!items) {
           let  permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
           speechText = requestAttributes.t('PERMISSIONS_MISSING');
@@ -822,7 +882,7 @@ const ErrorHandler = {
 };
 
 /**
- * Check List Permissions
+ * Helper function to check list permissions
  */
 async function hasListPermission(handlerInput){
     if(!handlerInput.requestEnvelope.context.System.user.permissions) {
@@ -834,11 +894,11 @@ async function hasListPermission(handlerInput){
 /**
  * Helper function to retrieve the top to-do item.
  */
-async function getToDoItems(handlerInput, listId) {
+async function getToDoItems(handlerInput, listId, listStatus) {
     const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
 
     console.log(`listid: ${listId}`);
-    const list = await listClient.getList(listId, listStatuses.ACTIVE);
+    const list = await listClient.getList(listId, listStatus);
     if (!list) {
         console.log('null list');
         return null;
@@ -888,6 +948,25 @@ const disambiguateSlot = async (handlerInput) => {
     }
     return true;
 }
+
+const getStringOfListItems = (filtered_items) => {
+    let list_items_string = "";
+    if(filtered_items.length === 1){
+        return filtered_items[0].value;
+    }
+
+    const filtered_items_length = filtered_items.length;
+    for(let i=0; i < filtered_items_length ; i++){
+        if( i == (filtered_items_length - 1)){
+            list_items_string += "and "+filtered_items[i].value;
+        }else{
+            list_items_string += filtered_items[i].value + ", ";
+        }
+    }
+
+    return list_items_string;
+
+};
 
 const resetReviewedItems = (obj_listitems) => {
     for(const key of Object.keys(obj_listitems)){
@@ -965,6 +1044,7 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
     NextItemIntentHandler,
+    GetCompletedItemsIntentHandler,
     MoreInfoIntentHandler,
     RepeatIntentHandler,
     RestartIntentHandler,

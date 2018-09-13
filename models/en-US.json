@@ -97,6 +97,24 @@
           ]
         },
         {
+          "name": "GetCompletedItemsIntent",
+          "slots": [],
+          "samples": [
+            "review completed items",
+            "get completed items"
+          ]
+        },
+        {
+          "name": "GetRemainingItemsIntent",
+          "slots": [],
+          "samples": [
+            "review items remaining",
+            "review remaining items",
+            "get remaining items",
+            "get items remaining"
+          ]
+        },
+        {
           "name": "RepeatIntent",
           "slots": [],
           "samples": [
