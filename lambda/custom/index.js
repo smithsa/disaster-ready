@@ -197,7 +197,10 @@ const LaunchRequestHandler = {
         attributes.listMissing = false;
         attributes.hasReviedAllItems = false;
         attributes.list_items_ids = {};
-        speechText = requestAttributes.t('NEW_SESSION_MESSAGE', requestAttributes.t('SKILL_NAME'), surveyQuestions.length)+'<break time=".5s"/> ';
+        let skill_name = requestAttributes.t('SKILL_NAME');
+        let list_name = requestAttributes.t('LIST_NAME');
+        let survey_length = surveyQuestions.length;
+        speechText = requestAttributes.t('NEW_SESSION_MESSAGE', skill_name, survey_length)+'<break time=".5s"/> ';
 
         if(attributes.hasOwnProperty('is_restarted')){
             if(attributes.is_restarted === true){
@@ -212,9 +215,9 @@ const LaunchRequestHandler = {
         if(questionsRemaining > 0){
             let nextSurveyQuestion = getNextListItem(questionsRemaining, surveyQuestions);
             let question_text = (questionsRemaining == 1) ? 'question' : 'questions';
-            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE', requestAttributes.t('SKILL_NAME'), questionsRemaining, question_text, question_text));
+            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE', skill_name, questionsRemaining, question_text, question_text));
         }else{
-            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE', requestAttributes.t('SKILL_NAME'), requestAttributes.t('LIST_NAME')));
+            speechText = getRandomArrayItem(requestAttributes.t('RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE', skill_name, list_name));
         }
     }
 
