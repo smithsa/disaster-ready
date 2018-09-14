@@ -68,7 +68,16 @@ const languageString = {
     LIST_EXISTS: 'Thank you for answering my questions. It appears an %s list already exists. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list."',
     LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create new list."',
     LIST_STATE_NOT_READY: 'Sorry, you can not get any list items until the survey is complete.',
-    GOODBYE_MESSAGES: ['Thank you for using %s. Goodbye.', 'Thank you for using %s. See you later.', 'Thank you for using the %s skill. Toodles!', 'Goodbye! Remember to check in and use %s again soon!'],
+    INTRODUCTION_LIST_STATE_REPROMPT: 'You can say next item or next to get the next item on your list',
+    SURVEY_COMPLETE_NEW_LIST : '',
+    SURVEY_COMPLETE_BRAND_NEW_LIST : '',
+    SURVEY_COMPLETE_INSTRUCTION : '',
+    REPEAT_LIST_ITEM : '',
+    CHECK_OFF_ERROR: '',
+    CHECK_OFF_SUCCESS: '',
+    UNCHECK_ERROR: '',
+    UNCHECK_SUCCESS: '',
+    NEXT_ITEM_RECITATION: '',
     HELP_MESSAGE_LIST_MISSING: 'Your %s list is missing. You can create a new list by saying "create new list."',
     HELP_MESSAGE_LIST_ALREADY_EXISTS: 'A %s list exists already. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list." If you have already deleted the list simply say "create new list."',
     HELP_MESSAGE_STATE_SURVEY: 'Please answer the questions asked so that I can customize your %s list. You can resume the survey by saying continue.',
@@ -77,8 +86,17 @@ const languageString = {
     HELP_MESSAGE_STATE_COMPLETE: 'You have completed all items on your %s list. You can start over by saying restart. Or you can leave the skill by saying exit.',
     HELP_MESSAGE_ALL_LIST_ITEMS_REVIEWED: 'You have reviewed all items on your %s list. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items." Or to start over at the top of your list say "next" or "next item."',
     LIST_COMPLETE_MESSAGE_LAUNCH: 'Your %s list has been completed! Great job! You can start over by saying restart. Or leave the skill by saying exit.',
+    MORE_INFO_INSTRUCTIONS: '',
     MORE_INFO_NOT_AVAILABLE: 'Sorry. Unfortunately, I do not have more information on this particular item. To get the next item on the list say: next or next item. To repeat the last item given, say: repeat.',
     MORE_INFO_INVALID: 'You can\'t ask for more information at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
+    FALLBACK_SURVEY: '',
+    FALLBACK_GENERAL: '',
+    UNHANDLED_GENERAL: '',
+    UNHANDLED_SURVEY: '',
+    ERROR_GENERAL: '',
+    ERROR_GENERAL_REPROMPT: '',
+    ERROR_RESPONSE: '',
+    GET_ITEMS_PROMPT: '',
     REPEAT_INVALID: 'You can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
     GET_COMPLETED_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review your completed items on your list. Resume your survey by saying: continue.',
     LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item or the list no longer exists. Try getting the next item on the list by saying: next or next item.',
@@ -91,6 +109,7 @@ const languageString = {
     NO_REMAINING_ITEMS: 'There are no more items remaining on your list. You have completed your list!',
     REMAINING_ITEMS: 'The items remaining on your %s list are: %s.',
     REMAINING_ITEM: 'There is only one item remaining on your %s list, which is : %s',
+    GOODBYE_MESSAGES: ['Thank you for using %s. Goodbye.', 'Thank you for using %s. See you later.', 'Thank you for using the %s skill. Toodles!', 'Goodbye! Remember to check in and use %s again soon!'],
     EXIT_MESSAGES: []
     },
   },
@@ -225,16 +244,16 @@ const LaunchRequestHandler = {
     attributesManager.setSessionAttributes(attributes);
     attributesManager.setPersistentAttributes(attributes);
     await attributesManager.savePersistentAttributes();
-
-    card_text = stripTags(speechText);
     let repromptText = '';
+    card_text = stripTags(speechText);
+
     if(questionsRemaining > 0){
         return handlerInput.responseBuilder
+            .withSimpleCard('Welcome', card_text)
             .speak(speechText)
-            .reprompt(repromptText)
             .getResponse();
     }else{
-        repromptText = 'You can say next item or next';
+        repromptText = requestAttributes.t('INTRODUCTION_LIST_STATE_REPROMPT');
     }
 
     return handlerInput.responseBuilder
@@ -372,7 +391,7 @@ const CompletedSurveyHandler = {
                 });
             }
         });
-
+        //TODO SURVEY_COMPLETE_NEW_LIST get these setup, text t localization.
         let speechOutput = 'Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/> ';
         if(list_recreated){
             speechOutput = " I\'ve created a brand new emergency supply kit list for you. ";
@@ -417,7 +436,7 @@ const RepeatIntentHandler = {
         if(sessionAttribute.sessionState === 'LIST'){
             const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
             const list_item = await listClient.getListItem(listId, last_alexa_id);
-
+            //TODO set up with REPEAT_LIST_ITEM;
             speechOutput = 'The last item I gave you was ' + list_item.value+'.';
             repromptText = 'The last item I gave you was ' + list_item.value+'.';
 
@@ -519,9 +538,11 @@ const CheckOffItemIntentHandler = {
         const listID = sessionAttributes.listID;
         const listItemId = sessionAttributes.lastListItemID;
         const itemstatus = listStatuses.COMPLETED;
+        //TODO CHECK_OFF_ERROR
         let speechOutPut = 'Sorry, I was unable to check off the last item on your list. Please make sure the list item exists. You can proceed by saying next.';
         let item_checked_message = null;
         if(listItemId !== null){
+            //TODO CHECK_OFF_SUCCESS
             let list_item_return = await updateListItem(handlerInput, listID, listItemId, itemstatus);
             item_checked_message = 'Got it! I\'ve checked off '+list_item_return.value+'.';
             speechOutPut = item_checked_message;
@@ -565,9 +586,11 @@ const UnCheckOffItemIntentHandler = {
         const listID = sessionAttributes.listID;
         const listItemId = sessionAttributes.lastListItemID;
         const itemstatus = listStatuses.ACTIVE;
+        //TODO UNCHECK_ERROR
         let speechOutPut = 'Sorry, I was unable to uncheck off the last item on your list. Please make sure the list item exists. You can proceed by saying next.';
         if(listItemId !== null){
             let list_item_return = await updateListItem(handlerInput, listID, listItemId, itemstatus);
+            //TODO UNCHECK_SUCCESS
             speechOutPut = 'Your wish is my command! I\'ve unchecked '+list_item_return.value+' on your list. To proceed and get the next item on your list, you can say: next.';
         }
 
@@ -628,6 +651,7 @@ const GetCompletedItemsIntentHandler = {
                 card_text = stripTags(speechOutPut);
             }
 
+            //TODO GET_ITEMS_PROMPT
             //TODO Instructions of what to do next? refer to what prompt use this intent
             speechOutPut += ' <break time=".3s"/>What would you like to do next? If you are not sure, you can say: help.';
         }
@@ -682,6 +706,7 @@ const GetRemainingItemsIntentHandler = {
                 card_text = stripTags(speechOutPut);
             }
 
+            //TODO GET_ITEMS_PROMPT
             //TODO Instructions of what to do next? refer to what prompt use this intent
             speechOutPut += ' <break time=".3s"/>What would you like to do next? If you are not sure, you can say: help.';
         }
@@ -783,8 +808,7 @@ const NextItemIntentHandler = {
               }
 
               let cur_session_attrs = attributesManager.getSessionAttributes();
-              //TODO case where current_list_item!= null and is not a custom item
-              //TODO write out text in requestAttributes
+              //TODO NEXT_ITEM_RECITATION (RANDOM)
               if(current_list_item !== null){
                   sessionAttributes.lastListItemID = current_list_item.id;
                   speechText = "The next item on your list is "+current_list_item.value + ".";
@@ -810,6 +834,7 @@ const NextItemIntentHandler = {
               if(list_items_ids.hasOwnProperty(current_list_item.id)){
                   if(list_items_ids[current_list_item.id].hasOwnProperty('type')){
                       sessionAttributes.lastListItemID = current_list_item.id;
+                      //TODO NEXT_ITEM_RECITATION (RANDOM)
                       speechText = "The next item on your list is "+current_list_item.value + ".";
                       repromptText = "The next item on your list is "+current_list_item.value + ". You added this item to your "+ list_name + ".";
                   }else{
@@ -833,6 +858,7 @@ const NextItemIntentHandler = {
                       }
 
                       if(nextItem.hasOwnProperty('full_description')){
+                          //TODO MORE_INFO_INSTRUCTIONS
                           speechText += " To get more information, you can say: more info.";
                       }
 
@@ -940,11 +966,11 @@ const FallBackIntentHandler = {
         let session_attr = handlerInput.attributesManager.getSessionAttributes();
         console.log(session_attr);
         if(session_attr.sessionState === 'SURVEY'){
-            return handlerInput.responseBuilder
+            return handlerInput.responseBuilder //TODO FALLBACK_SURVEY
                 .speak('Sorry, I had trouble understanding what you said. You can resume the survey and answer the question again by saying continue.')
                 .getResponse();
         }else{
-            return handlerInput.responseBuilder
+            return handlerInput.responseBuilder //TODO FALLBACK_GENERAL
                 .speak('Sorry, I had trouble doing what you asked.  Please ask for it again.')
                 .reprompt('Sorry, I had trouble doing what you asked.  Please ask for it again.')
                 .getResponse();
@@ -965,6 +991,7 @@ const UnhandledIntent = {
             let questionsRemaining = countEmptyFields(temp_survey_intent);
             let init_slot = getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
             let surveyQuestions = requestAttributes.t('SURVEY_QUESTIONS');
+            //TODO UNHANDLED_SURVEY
             let speechText = "Sorry, I didn't get that. Please answer the question again. To resume the survey say: continue.";
 
             return handlerInput.responseBuilder
@@ -973,7 +1000,7 @@ const UnhandledIntent = {
                 .getResponse();
         }
 
-        return handlerInput.responseBuilder
+        return handlerInput.responseBuilder //TODO UNHANDLED_GENERAL
             .speak("I didn't quite get that. Please repeat your request.")
             .getResponse();
     },
@@ -1007,7 +1034,7 @@ const ErrorHandler = {
       console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
       console.log(`Error handled: ${error}`);
       console.log(error);
-      let end_session = false;
+      let end_session = false; //TODO ERROR_RESPONSE
       let speechOutput = 'Sorry an error occurred, I am unable to process your request.';
       if(error.hasOwnProperty('response')){
           if(error.response.message === 'List id does not exists.' || error.response.message === 'list is not found.'){
@@ -1046,6 +1073,8 @@ const ErrorHandler = {
               .getResponse();
       }
 
+      //TODO ERROR_GENERAL
+      //TODO ERROR_GENERAL_REPROMPT
       return handlerInput.responseBuilder
           .speak('Sorry, I had trouble doing what you asked.  Please ask for it again.')
           .reprompt('Sorry, I had trouble doing what you asked.  Please ask for it again.')
