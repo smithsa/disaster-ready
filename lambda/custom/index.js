@@ -63,6 +63,8 @@ const languageString = {
     REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, you can say, "next" or "next item." Or review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
     REVIEWED_ALL_ITEMS_REPROMPT: 'You can say "next" or "next item" to review the remaining items again. You can review all completed items by saying "review completed". Or to review all remaining items say "review items remaining."',
     LIST_MISSING: 'I was unable to find your %s List. Please create a new list by saying "create new list."',
+    LIST_ARCHIVED_ERROR: 'Your %s list appears to be archived. I can not update items on an archived list. Please restore your list.',
+    LIST_ARCHIVED_CREATION_ERROR: 'Your %s list appears to be archived. I can not add list items on an archived list. Please restore your list.',
     LIST_EXISTS: 'Thank you for answering my questions. It appears an %s list already exists. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list."',
     LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create new list."',
     LIST_STATE_NOT_READY: 'Sorry, you can not get any list items until the survey is complete.',
@@ -79,7 +81,7 @@ const languageString = {
     MORE_INFO_INVALID: 'You can\'t ask for more information at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
     REPEAT_INVALID: 'You can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
     GET_COMPLETED_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review your completed items on your list. Resume your survey by saying: continue.',
-    LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item no longer exists. Get the next item on the list by saying: next or next item.',
+    LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item or the list no longer exists. Try getting the next item on the list by saying: next or next item.',
     COMPLETED_ITEMS_EMPTY_LIST: 'Your %s list has no completed items.',
     NO_COMPLETED_ITEMS: 'There are no completed items on your list.',
     COMPLETED_ITEMS: 'The items completed on your %s list are: %s.',
@@ -1002,28 +1004,41 @@ const ErrorHandler = {
       console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
       console.log(`Error handled: ${error}`);
       console.log(error);
+      let end_session = false;
       let speechOutput = 'Sorry an error occurred, I am unable to process your request.';
       if(error.hasOwnProperty('response')){
-          if(error.response.message === 'List id does not exists.'){
+          if(error.response.message === 'List id does not exists.' || error.response.message === 'list is not found.'){
               session_attrs.listMissing = true;
               speechOutput = requestAttributes.t('LIST_MISSING', list_name)
           }
           else if(error.response.message === 'List name already exists.'){
               session_attrs.listExists = true;
+              end_session = true;
               speechOutput = requestAttributes.t('LIST_EXISTS', list_name);
           }else if(error.response.message === 'List id or Item id does not exist.'){
               speechOutput = requestAttributes.t('LIST_ITEM_NONE_EXISTANT');
+          }else if(error.response.message === 'Updating of items in archived list is not allowed.'){
+              speechOutput = requestAttributes.t('LIST_ARCHIVED_ERROR', list_name);
+              end_session = true;
           }else if(error.response.hasOwnProperty('Message')){
               if(error.response.Message === 'Request is not authorized.'){
                   speechOutput = requestAttributes.t('GENERAL_PERMISSIONS_MISSING');
-            }
+                  end_session = true;
+              }else if(error.response.Message === 'Updating of items in archived list is not allowed.'){
+                  speechOutput = requestAttributes.t('LIST_ARCHIVED_ERROR', list_name);
+                  end_session = true;
+              }
+              else if(error.response.Message === 'Creation of items in archived list is not allowed.'){
+                  speechOutput = requestAttributes.t('LIST_ARCHIVED_CREATION_ERROR', list_name);
+                  end_session = true;
+              }
           }
 
           await handlerInput.attributesManager.setSessionAttributes(session_attrs);
           await handlerInput.attributesManager.setPersistentAttributes(session_attrs);
           await handlerInput.attributesManager.savePersistentAttributes();
           return handlerInput.responseBuilder
-              .withShouldEndSession(false)
+              .withShouldEndSession(end_session)
               .speak(speechOutput)
               .getResponse();
       }
