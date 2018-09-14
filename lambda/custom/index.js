@@ -501,6 +501,7 @@ const RestartIntentHandler = {
         return LaunchRequestHandler.handle(handlerInput);
     }
 };
+
 const CheckOffItemIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -517,7 +518,6 @@ const CheckOffItemIntentHandler = {
         let item_checked_message = null;
         if(listItemId !== null){
             let list_item_return = await updateListItem(handlerInput, listID, listItemId, itemstatus);
-            console.log('RETURN VALUE', list_item_return);
             item_checked_message = 'Got it! I\'ve checked off '+list_item_return.value+'.';
             speechOutPut = item_checked_message;
         }
@@ -538,6 +538,40 @@ const CheckOffItemIntentHandler = {
                 .speak(speechOutPut)
                 .withShouldEndSession(true)
                 .getResponse();
+        }
+
+        const responseBuilder = handlerInput.responseBuilder;
+        return responseBuilder
+            .withShouldEndSession(false)
+            .speak(speechOutPut)
+            .getResponse();
+    }
+};
+
+const UnCheckOffItemIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'UnCheckOffItemIntent';
+    },
+    async handle(handlerInput) {
+        const attributesManager = handlerInput.attributesManager;
+        const requestAttributes = attributesManager.getRequestAttributes();
+        const sessionAttributes = await attributesManager.getPersistentAttributes();
+        const listID = sessionAttributes.listID;
+        const listItemId = sessionAttributes.lastListItemID;
+        const itemstatus = listStatuses.ACTIVE;
+        let speechOutPut = 'Sorry, I was unable to uncheck off the last item on your list. Please make sure the list item exists. You can proceed by saying next.';
+        if(listItemId !== null){
+            let list_item_return = await updateListItem(handlerInput, listID, listItemId, itemstatus);
+            speechOutPut = 'Your wish is my command! I\'ve unchecked '+list_item_return.value+' on your list. To proceed and get the next item on your list, you can say: next.';
+        }
+
+        const items = await getToDoItems(handlerInput, listID, listStatuses.ACTIVE);
+        if(items !== list_is_empty){
+            sessionAttributes.sessionState = 'LIST';
+            attributesManager.setSessionAttributes(sessionAttributes);
+            attributesManager.setPersistentAttributes(sessionAttributes);
+            await attributesManager.savePersistentAttributes();
         }
 
         const responseBuilder = handlerInput.responseBuilder;
@@ -1182,6 +1216,7 @@ exports.handler = skillBuilder
     LaunchRequestHandler,
     NextItemIntentHandler,
     CheckOffItemIntentHandler,
+    UnCheckOffItemIntentHandler,
     GetCompletedItemsIntentHandler,
     GetRemainingItemsIntentHandler,
     MoreInfoIntentHandler,
