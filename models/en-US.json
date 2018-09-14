@@ -123,6 +123,80 @@
           ]
         },
         {
+          "name": "UnCheckOffItemIntent",
+          "slots": [],
+          "samples": [
+            "uncheck",
+            "please uncheck",
+            "uncheck please",
+            "uncheck item please",
+            "uncheck item",
+            "please uncheck item",
+            "uncheck the item",
+            "please uncheck the item",
+            "uncheck the item please",
+            "uncheck the list item please",
+            "uncheck the list item",
+            "please uncheck the list item",
+            "uncheck list item please",
+            "uncheck list item",
+            "please uncheck list item",
+            "leave item unchecked",
+            "please leave item unchecked",
+            "leave item unchecked please",
+            "leave the item unchecked",
+            "uncheck item on list",
+            "please uncheck item on list",
+            "uncheck item on list please",
+            "uncheck the item on list",
+            "please uncheck the item on list",
+            "uncheck the item on list please",
+            "uncheck the item on the list",
+            "please uncheck the item on the list",
+            "uncheck the item on the list please",
+            "uncheck item on the list",
+            "uncheck item on the list please",
+            "please uncheck item on the list",
+            "undo please",
+            "please undo",
+            "undo",
+            "undo check please",
+            "please undo check",
+            "undo check",
+            "undo the check please",
+            "please undo the check",
+            "undo the check"
+          ]
+        },
+        {
+          "name": "CheckOffItemIntent",
+          "slots": [],
+          "samples": [
+            "check item off",
+            "please check item off",
+            "you can check item off",
+            "check item off please",
+            "check item off list",
+            "please check item off list",
+            "check item off list please",
+            "check off item",
+            "please check off item",
+            "check off item please",
+            "check the item off",
+            "please check the item off",
+            "you can check the item off",
+            "check the item off please",
+            "check the item off list",
+            "please check the item off list",
+            "check the item off list please",
+            "check off the item",
+            "please check off the item",
+            "check off item please",
+            "check",
+            "check please"
+          ]
+        },
+        {
           "name": "RepeatIntent",
           "slots": [],
           "samples": [
@@ -147,7 +221,8 @@
                   "yep",
                   "ye",
                   "you know it",
-                  "I do"
+                  "I do",
+                  "yes, I do"
                 ]
               }
             },
@@ -162,7 +237,9 @@
                   "nah",
                   "no",
                   "ne",
-                  "I wish"
+                  "I wish",
+                  "No, I don't",
+                  "No, I do not"
                 ]
               }
             }

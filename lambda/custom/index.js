@@ -48,7 +48,7 @@ const languageString = {
         'hasElderly': ['Do you live with any elderly people?', 'Do you live with a person who is a senior citizen?']
     },
     SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
-    SURVEY_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list. Congratulations! <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Thank you for using the Disaster Ready Skill.',
+    LIST_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list. Congratulations! <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Thank you for using the Disaster Ready Skill.',
     NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters.<break time=".5s"/> First answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
     RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE: [
         'Welcome back to the %s skill. Let\'s pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.'
@@ -57,6 +57,7 @@ const languageString = {
         'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your %s list you can say "next item" or "next"'
     ],
     START_PERMISSIONS_MISSING: 'Welcome to the %s skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
+    GENERAL_PERMISSIONS_MISSING: 'I was unable to do what you asked. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
     RESTART_SESSION_LAUNCH_MESSAGE: 'Okay, let\'s start over. I will walk you through building an emergency supply kit for disasters again. Let\'s go through the survey once more to consider the unique needs of your household. To begin say: start survey.',
     PERMISSIONS_MISSING: 'Alexa List permissions are missing. You can grant permissions within the Alexa app.',
     REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, you can say, "next" or "next item." Or review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
@@ -133,12 +134,12 @@ const LaunchRequestHandler = {
     const attributesManager = handlerInput.attributesManager;
     const requestAttributes = attributesManager.getRequestAttributes();
     const surveyQuestions = requestAttributes.t('SURVEY_QUESTIONS');
-
+    const skill_name = requestAttributes.t('SKILL_NAME');
     //permission checks
     const permissionCheck = await hasListPermission(handlerInput);
     if(!permissionCheck){
         const permissions = ['read::alexa:household:list', 'write::alexa:household:list'];
-        let speechText = requestAttributes.t('START_PERMISSIONS_MISSING', requestAttributes.t('SKILL_NAME'));
+        let speechText = requestAttributes.t('START_PERMISSIONS_MISSING', skill_name);
         return handlerInput.responseBuilder
             .speak(speechText)
             .withAskForPermissionsConsentCard(permissions)
@@ -400,7 +401,7 @@ const RepeatIntentHandler = {
     },
     async handle(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
-        const sessionAttribute = attributesManager.getSessionAttributes();
+        const sessionAttribute = await attributesManager.getPersistentAttributes();
         const requestAttribute = attributesManager.getRequestAttributes();
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
         let last_alexa_id = sessionAttribute.lastListItemID;
@@ -416,20 +417,23 @@ const RepeatIntentHandler = {
             repromptText = 'The last item I gave you was ' + list_item.value+'.';
 
             if(list_items_ids.hasOwnProperty(last_alexa_id)){
-                let nextItem = getListItemsByInternalID(list_items_ids[last_alexa_id], disaster_kit_list);
+                let nextItem = getListItemsByInternalID(list_items_ids[last_alexa_id].id, disaster_kit_list);
                 nextItem = nextItem[0];
                 if(typeof nextItem !== 'undefined' && nextItem){
-                    if(nextItem.hasOwnProperty('short_description')){
+                    if(nextItem.hasOwnProperty('name')){
                         if(nextItem.hasOwnProperty('use_a')){
-                            speechOutput = "The last item I gave you was a " + list_item.value +". "+nextItem.short_description;
+                            speechOutput = "The last item I gave you was a " + list_item.value +".";
+                            if(nextItem.hasOwnProperty('short_description')){
+                                speechOutput+= ' '+nextItem.short_description;
+                            }
                         }else{
-                            speechOutput = "The last item I gave you was " + list_item.value +". "+nextItem.short_description;
+                            speechOutput = "The last item I gave you was " + list_item.value +".";
+                            if(nextItem.hasOwnProperty('short_description')){
+                                speechOutput+= ' '+nextItem.short_description;
+                            }
                         }
                     }
                 }
-                console.log('NEXT LIST ITEM:::', nextItem);
-
-
             }
         }
 
@@ -446,21 +450,26 @@ const MoreInfoIntentHandler = {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
           && handlerInput.requestEnvelope.request.intent.name === 'MoreInfoIntent';
     },
-    handle(handlerInput) {
+    async handle(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
-        const sessionAttribute = attributesManager.getSessionAttributes();
+        const sessionAttribute = await attributesManager.getPersistentAttributes();
         const requestAttribute = attributesManager.getRequestAttributes();
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
+        console.log('SESSION STATE', sessionAttribute.sessionState);
         let speechOutput = requestAttribute.t('MORE_INFO_NOT_AVAILABLE');
         if(sessionAttribute.sessionState === 'LIST'){
             let last_alexa_id = sessionAttribute.lastListItemID;
             let last_alexa_items = sessionAttribute.list_items_ids;
+            console.log('IN THE RIGHT LIST SECTION');
             if(last_alexa_items.hasOwnProperty(last_alexa_id)){
+                console.log('LIST ITEM HAS THE VALUES');
                 let last_alexa_item_ob = last_alexa_items[last_alexa_id];
                 if(last_alexa_item_ob.hasOwnProperty('id')){
                     let internal_id = last_alexa_item_ob['id'];
+                    console.log('INTERNAL_ID', internal_id);
                     let nextItem = getListItemsByInternalID(internal_id, disaster_kit_list);
                     nextItem = nextItem[0];
+                    console.log('NEXT ITEM', nextItem);
                     if(nextItem.hasOwnProperty('full_description')){
                         speechOutput = nextItem.full_description + ' To get the next item on your list. Simply say, "next" or "next item."';
                     }
@@ -490,6 +499,52 @@ const RestartIntentHandler = {
         attributeManager.setPersistentAttributes(attributes);
         await attributeManager.savePersistentAttributes()
         return LaunchRequestHandler.handle(handlerInput);
+    }
+};
+const CheckOffItemIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'CheckOffItemIntent';
+    },
+    async handle(handlerInput) {
+        const attributesManager = handlerInput.attributesManager;
+        const requestAttributes = attributesManager.getRequestAttributes();
+        const sessionAttributes = await attributesManager.getPersistentAttributes();
+        const listID = sessionAttributes.listID;
+        const listItemId = sessionAttributes.lastListItemID;
+        const itemstatus = listStatuses.COMPLETED;
+        let speechOutPut = 'Sorry, I was unable to check off the last item on your list. Please make sure the list item exists. You can proceed by saying next.';
+        let item_checked_message = null;
+        if(listItemId !== null){
+            let list_item_return = await updateListItem(handlerInput, listID, listItemId, itemstatus);
+            console.log('RETURN VALUE', list_item_return);
+            item_checked_message = 'Got it! I\'ve checked off '+list_item_return.value+'.';
+            speechOutPut = item_checked_message;
+        }
+
+        const items = await getToDoItems(handlerInput, listID, listStatuses.ACTIVE);
+        if(items === list_is_empty){
+            if(item_checked_message !== null){
+                speechOutPut = item_checked_message +' <break time=".2s"/>'+requestAttributes.t('LIST_COMPLETE_MESSAGE');
+            }else{
+                speechOutPut = requestAttributes.t('LIST_COMPLETE_MESSAGE');
+            }
+            sessionAttributes.sessionState = 'COMPLETE';
+            attributesManager.setSessionAttributes(sessionAttributes);
+            attributesManager.setPersistentAttributes(sessionAttributes);
+            await attributesManager.savePersistentAttributes();
+
+            return handlerInput.responseBuilder
+                .speak(speechOutPut)
+                .withShouldEndSession(true)
+                .getResponse();
+        }
+
+        const responseBuilder = handlerInput.responseBuilder;
+        return responseBuilder
+            .withShouldEndSession(false)
+            .speak(speechOutPut)
+            .getResponse();
     }
 };
 
@@ -650,7 +705,7 @@ const NextItemIntentHandler = {
 
     }
     else if(items === list_is_empty){
-        speechText = requestAttributes.t('SURVEY_COMPLETE_MESSAGE');
+        speechText = requestAttributes.t('LIST_COMPLETE_MESSAGE');
         sessionAttributes.sessionState = 'COMPLETE';
         attributesManager.setSessionAttributes(sessionAttributes);
         attributesManager.setPersistentAttributes(sessionAttributes);
@@ -725,10 +780,16 @@ const NextItemIntentHandler = {
                       sessionAttributes.lastListItemID = current_list_item.id;
 
                       if(nextItem.hasOwnProperty('use_a')){
-                          speechText = "The next item is a " + current_list_item.value +". "+nextItem.short_description;
+                          speechText = "The next item is a " + current_list_item.value +".";
+                          if(nextItem.hasOwnProperty('short_description')){
+                              speechText += ' '+nextItem.short_description;
+                          }
                           repromptText = "The next item is a " + current_list_item.value+".";
                       }else{
-                          speechText = "The next item is " + current_list_item.value +". "+nextItem.short_description;
+                          speechText = "The next item is " + current_list_item.value +".";
+                          if(nextItem.hasOwnProperty('short_description')){
+                              speechText += ' '+nextItem.short_description;
+                          }
                           repromptText = "The next item is " + current_list_item.value+".";
                       }
 
@@ -902,20 +963,26 @@ const ErrorHandler = {
       const request = handlerInput.requestEnvelope.request;
       const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
       const session_attrs = handlerInput.attributesManager.getSessionAttributes();
+      const skill_name = requestAttributes.t('SKILL_NAME');
+      const list_name = requestAttributes.t('LIST_NAME');
       console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
       console.log(`Error handled: ${error}`);
       console.log(error);
-      let speechOutput = '';
+      let speechOutput = 'Sorry an error occurred, I am unable to process your request.';
       if(error.hasOwnProperty('response')){
           if(error.response.message === 'List id does not exists.'){
               session_attrs.listMissing = true;
-              speechOutput = requestAttributes.t('LIST_MISSING', requestAttributes.t('LIST_NAME'))
+              speechOutput = requestAttributes.t('LIST_MISSING', list_name)
           }
           else if(error.response.message === 'List name already exists.'){
               session_attrs.listExists = true;
-              speechOutput = requestAttributes.t('LIST_EXISTS', requestAttributes.t('LIST_NAME'));
+              speechOutput = requestAttributes.t('LIST_EXISTS', list_name);
           }else if(error.response.message === 'List id or Item id does not exist.'){
               speechOutput = requestAttributes.t('LIST_ITEM_NONE_EXISTANT');
+          }else if(error.response.hasOwnProperty('Message')){
+              if(error.response.Message === 'Request is not authorized.'){
+                  speechOutput = requestAttributes.t('GENERAL_PERMISSIONS_MISSING');
+            }
           }
 
           await handlerInput.attributesManager.setSessionAttributes(session_attrs);
@@ -942,6 +1009,21 @@ async function hasListPermission(handlerInput){
         return false;
     }
     return true;
+}
+
+/**
+ * List API to delete the top todo item.
+ */
+async function updateListItem(handlerInput, listID, listItemID, listItemStatus) {
+    const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
+    const item = await listClient.getListItem(listID, listItemID);
+
+    const updateRequest = {
+        value: item.value,
+        status: listItemStatus,
+        version: item.version,
+    };
+    return listClient.updateListItem(listID, item.id, updateRequest);
 }
 
 /**
@@ -1099,6 +1181,7 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
     NextItemIntentHandler,
+    CheckOffItemIntentHandler,
     GetCompletedItemsIntentHandler,
     GetRemainingItemsIntentHandler,
     MoreInfoIntentHandler,
