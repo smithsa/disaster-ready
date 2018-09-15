@@ -23,7 +23,7 @@
           "name": "SurveyIntent",
           "slots": [
             {
-              "name": "houseHoldQuantity",
+              "name": "hasPets",
               "type": "AffirmativesAndNegations",
               "samples": []
             },
@@ -33,7 +33,22 @@
               "samples": []
             },
             {
-              "name": "hasElderly",
+              "name": "hasPrescriptionMedicine",
+              "type": "AffirmativesAndNegations",
+              "samples": []
+            },
+            {
+              "name": "isMenstrating",
+              "type": "AffirmativesAndNegations",
+              "samples": []
+            },
+            {
+              "name": "hasEyeGlasses",
+              "type": "AffirmativesAndNegations",
+              "samples": []
+            },
+            {
+              "name": "hasSchoolAgedChildren",
               "type": "AffirmativesAndNegations",
               "samples": []
             }
@@ -42,7 +57,10 @@
             "continue survey",
             "start survey",
             "start",
-            "continue"
+            "continue",
+            "start survey again",
+            "ask questions again",
+            "ask the question again"
           ]
         },
         {
@@ -258,12 +276,12 @@
           "prompts": {},
           "slots": [
             {
-              "name": "houseHoldQuantity",
+              "name": "hasPets",
               "type": "AffirmativesAndNegations",
               "confirmationRequired": false,
               "elicitationRequired": true,
               "prompts": {
-                "elicitation": "Elicit.Slot.1162780729786.1432530920282"
+                "elicitation": "Elicit.Slot.1162780729786.hasPets"
               }
             },
             {
@@ -272,16 +290,43 @@
               "confirmationRequired": false,
               "elicitationRequired": true,
               "prompts": {
-                "elicitation": "Elicit.Slot.1162780729786.1143025724798"
+                "elicitation": "Elicit.Slot.1162780729786.hasInfants"
               }
             },
             {
-              "name": "hasElderly",
+              "name": "hasPrescriptionMedicine",
               "type": "AffirmativesAndNegations",
               "confirmationRequired": false,
               "elicitationRequired": true,
               "prompts": {
-                "elicitation": "Elicit.Slot.1162780729786.elderly"
+                "elicitation": "Elicit.Slot.1162780729786.hasPrescriptionMedicine"
+              }
+            },
+            {
+              "name": "isMenstrating",
+              "type": "AffirmativesAndNegations",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1162780729786.isMenstrating"
+              }
+            },
+            {
+              "name": "hasEyeGlasses",
+              "type": "AffirmativesAndNegations",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1162780729786.hasEyeGlasses"
+              }
+            },
+            {
+              "name": "hasSchoolAgedChildren",
+              "type": "AffirmativesAndNegations",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1162780729786.hasSchoolAgedChildren"
               }
             }
           ]
@@ -290,41 +335,80 @@
     },
     "prompts": [
       {
-        "id": "Elicit.Slot.1162780729786.1432530920282",
+        "id": "Elicit.Slot.1162780729786.hasPets",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Are other people in your household?"
+            "value": "Do you have a pet?"
           },
           {
             "type": "PlainText",
-            "value": "Are there other people you live with?"
+            "value": "Are there any animals in your home that you take care of?"
           }
         ]
       },
       {
-        "id": "Elicit.Slot.1162780729786.1143025724798",
+        "id": "Elicit.Slot.1162780729786.hasInfants",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Is there an infant in your household?"
+            "value": "Do you have a baby or an infant in your household?"
           },
           {
             "type": "PlainText",
-            "value": "Is there a baby that lives with you?"
+            "value": "Is there a young child or baby in your home?"
           }
         ]
       },
       {
-        "id": "Elicit.Slot.1162780729786.elderly",
+        "id": "Elicit.Slot.1162780729786.hasPrescriptionMedicine",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Are there any elderly people in your household?"
+            "value": "Does anyone in your household take prescription medicine?"
           },
           {
             "type": "PlainText",
-            "value": "Do elderly people live with you?"
+            "value": "Is anyone in your household prescribed any medication or drug?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.1162780729786.isMenstrating",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Does anyone in your home use feminine hygiene products?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Is there anyone in your home who uses menstrual products?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.1162780729786.hasEyeGlasses",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Is there a member of your family who needs glasses to see?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Do anyone in your home wear prescription eyeglasses?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.1162780729786.hasSchoolAgedChildren",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Is there a member of your family who needs glasses to see?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Do anyone in your home wear prescription eyeglasses?"
           }
         ]
       }

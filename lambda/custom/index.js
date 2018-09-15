@@ -28,11 +28,14 @@ const languageString = {
     translation: {
     SKILL_NAME: 'Disaster Ready',
     LIST_NAME: 'Emergency Supply Kit',
-    SURVEY_QUESTIONS_SLOTS: ['houseHoldQuantity', 'hasInfants', 'hasElderly'],
+    SURVEY_QUESTIONS_SLOTS: ['hasPets', 'hasInfants', 'hasPrescriptionMedicine', 'isMenstrating', 'hasEyeGlasses', 'hasSchoolAgedChildren'],
     SURVEY_QUESTIONS: [ //order the same as model and update as model changes
-        'Do you live with people are in your household?',
-        'Is there an infant in your household?',
-        'Are there any elderly people in your household?',
+        'Are there any animals in your home that you take care of?',
+        'Is there a young child or baby in your home?',
+        'Is there a member of your household who takes a prescription drug?',
+        'Is there member of your household who uses feminine hygiene products?',
+        'Does anyone in your home have impaired vision and needs eyeglasses to see?',
+        'Is anyone in your household in primary or elementary school?',
     ],
     SURVEY_QUESTIONS_REPROMPTS_PREFACES : ['Sorry, I didn\'t get that. %s %s',
       'I didn\'t seem to get that, please answer the following question again. %s %s',
@@ -40,9 +43,12 @@ const languageString = {
       'Sorry, I didn\'t understand your answer. Please answer the question again. %s %s',
     ],
     SURVEY_QUESTIONS_REPROMPTS: {
-        'houseHoldQuantity': ['Do you live with other people?', 'Are other people in your household?'],
-        'hasInfants': ['Does a baby live with you?', 'Is there a baby in your household?', 'Are there any infants in your household?'],
-        'hasElderly': ['Do you live with any elderly people?', 'Do you live with a person who is a senior citizen?']
+        'hasPets': ['Do you have a pet?', 'Do you own a pet?', ''],
+        'hasInfants': ['Is there a young child or baby in your home?', 'Do you take care of a baby?', 'Do you have a baby or an infant in your household?'],
+        'hasPrescriptionMedicine': ['Does anyone in your household take prescription medicine?', 'Is anyone in your household prescribed any medication or drug?', 'Is there a member of your household who takes a prescription drug?'],
+        'isMenstrating': ['Does anyone in your home use feminine hygiene products?', 'Is there anyone in your home who uses menstrual products?', 'Is there member of your household who uses feminine hygiene products?'],
+        'hasEyeGlasses': ['Do anyone in your home wear prescription eyeglasses?', 'Is there a member of your family who needs glasses to see?', 'Does anyone in your home have impaired vision and needs eyeglasses to see?'],
+        'hasSchoolAgedChildren': ['Are there school aged children in your household?', 'Do you have any young children in your home?', 'Is anyone in your household in primary or elementary school?']
     },
     SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
     LIST_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list. Congratulations! <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Thank you for using the Disaster Ready Skill.',
