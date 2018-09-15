@@ -369,7 +369,7 @@
           },
           {
             "type": "PlainText",
-            "value": "Is anyone in your household prescribed any medication or drug?"
+            "value": "Is anyone in your household prescribed a medication or drug?"
           }
         ]
       },
@@ -395,7 +395,7 @@
           },
           {
             "type": "PlainText",
-            "value": "Do anyone in your home wear prescription eyeglasses?"
+            "value": "Does anyone in your home wear prescription eyeglasses?"
           }
         ]
       },
@@ -404,11 +404,11 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "Is there a member of your family who needs glasses to see?"
+            "value": "Are there school aged children in your household?"
           },
           {
             "type": "PlainText",
-            "value": "Do anyone in your home wear prescription eyeglasses?"
+            "value": "Is anyone in your household in primary or elementary school?"
           }
         ]
       }

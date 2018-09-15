@@ -47,7 +47,7 @@ const languageString = {
         'hasInfants': ['Is there a young child or baby in your home?', 'Do you take care of a baby?', 'Do you have a baby or an infant in your household?'],
         'hasPrescriptionMedicine': ['Does anyone in your household take prescription medicine?', 'Is anyone in your household prescribed any medication or drug?', 'Is there a member of your household who takes a prescription drug?'],
         'isMenstrating': ['Does anyone in your home use feminine hygiene products?', 'Is there anyone in your home who uses menstrual products?', 'Is there member of your household who uses feminine hygiene products?'],
-        'hasEyeGlasses': ['Do anyone in your home wear prescription eyeglasses?', 'Is there a member of your family who needs glasses to see?', 'Does anyone in your home have impaired vision and needs eyeglasses to see?'],
+        'hasEyeGlasses': ['Does anyone in your home wear prescription eyeglasses?', 'Is there a member of your family who needs glasses to see?', 'Does anyone in your home have impaired vision and needs eyeglasses to see?'],
         'hasSchoolAgedChildren': ['Are there school aged children in your household?', 'Do you have any young children in your home?', 'Is anyone in your household in primary or elementary school?']
     },
     SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
@@ -984,9 +984,11 @@ const NextItemIntentHandler = {
                       let reprompt_prompts = requestAttributes.t('NEXT_ITEM_REPROMPT');
                       repromptText = getRandomArrayItem(reprompt_prompts);
 
+                      let cardText = speechText;
                       if(nextItem.hasOwnProperty('full_description')){
                           let more_info_prompts = requestAttributes.t('MORE_INFO_INSTRUCTIONS');
                           speechText += ' '+getRandomArrayItem(more_info_prompts);
+                          let cardText = nextItem.full_description;
                       }
 
                       attributesManager.setSessionAttributes(sessionAttributes);
@@ -998,14 +1000,14 @@ const NextItemIntentHandler = {
                               .speak(speechText)
                               .reprompt(speechText)
                               .withShouldEndSession(false)
-                              .withStandardCard(nextItem.name, nextItem.full_description, nextItem.image_small, nextItem.image_large)
+                              .withStandardCard(nextItem.name, cardText, nextItem.image_small, nextItem.image_large)
                               .getResponse();
                       }else{
                           return handlerInput.responseBuilder
                               .speak(speechText)
                               .reprompt(speechText)
                               .withShouldEndSession(false)
-                              .withSimpleCard(nextItem.name, nextItem.full_description)
+                              .withSimpleCard(nextItem.name, cardText)
                               .getResponse();
                       }
                   }
