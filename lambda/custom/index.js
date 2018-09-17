@@ -71,7 +71,7 @@ const languageString = {
     RESTART_SESSION_LAUNCH_MESSAGE: 'Okay, let\'s start over. I will walk you through building an emergency supply kit for disasters again. Let\'s go through the survey once more to consider the unique needs of your household. To begin say: start survey.',
     RESTART_SESSION_LAUNCH_MESSAGE_REPROMPT: 'We will restart the process, and go through the survey again once you say: start survey',
     PERMISSIONS_MISSING: 'Alexa List permissions are missing. You can grant permissions within the Alexa app.',
-    REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, you can say, "next" or "next item." Or review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
+    REVIEWED_ALL_ITEMS_SPEECH: 'All items on your %s have been reviewed. To start at the top of the list again, say: "next". You can also review all completed items by saying: "review completed". Or review all remaining items by saying: "review items remaining."',
     REVIEWED_ALL_ITEMS_REPROMPT: 'You can say "next" or "next item" to review the remaining items again. You can review all completed items by saying "review completed". Or to review all remaining items say "review items remaining."',
     LIST_MISSING: 'I was unable to find your %s list. Please create a new list by saying "create new list."',
     LIST_MISSING_REPROMPT: 'Your %s list no longer exists, it must have been deleted. You can create a new list by saying "create new list."',
@@ -115,18 +115,20 @@ const languageString = {
         'Checking off %s.',
         'You got it! Checking off %s.',
         'Your wish is my command! Checking off %s.',
+        '<prosody rate="medium" pitch="+10%%" volume="+3dB">You rock!</prosody> Checking off %s.',
         'Your wish is my command! %s has been checked off.'
     ],
     CHECK_INSTRUCTIONS: [
-        'To get the next item on your list. Just say: "next". Or to undo this action say "Uncheck Item" or "Undo".',
-        'You can get the next item on your list by saying: "next". Additionally, you can undo this last action by saying "Uncheck Item" or "Undo"',
-        'You can proceed by saying "get next item" Or you can undo this last action by saying "Uncheck Item" or "Undo"'
+        'To get the next item on your list. Just say: "next". Or to undo this action say "Uncheck" or "Undo".',
+        'You can get the next item on your list by saying: "next". Additionally, you can undo this last action by saying "Uncheck" or "Undo"',
+        'You can proceed by saying "get next item" Or you can undo this last action by saying "Uncheck" or "Undo"'
     ],
     UNCHECK_ERROR: 'Sorry, <break time=".2s"/>I was unable to uncheck off the last item on your list. Please make sure the list item exists. You can proceed by saying: "next".',
     UNCHECK_SUCCESS: [
         'Your wish is my command! I\'ve unchecked %s on your list. To proceed and get the next item on your list, you can say: "next".',
         'I\'ve unchecked %s on your list. Get the next item on your list by saying: "next".',
         'I\'ve unchecked %s on your list. Get the next item on your list by saying: "next".',
+        'Understood. <break time=".2s"/>Get the next item on your list by saying: "next".',
         'Got it, %s has been unchecked on your list. Say: "next" or "next item", to get the next item.'
     ],
     UNCHECK_INSTRUCTIONS: [
@@ -141,41 +143,45 @@ const languageString = {
         'This is a custom item you added to your %s list.'
     ],
     NEXT_ITEM_RECITATION: [
-        'The next item on your list is %s.',
-        'The next item I have for you is %s.',
-        'The next item for your kit is %s.',
+        'The next item on your list is "%s".',
+        'The next item I have for you is "%s".',
+        'Here is the next thing on your list: "%s".',
+        'Here is the next item: "%s".',
+        'The next item for your kit is "%s".',
         '%s is the next item on your list!',
-        'The next item I have for you is: %s.',
-        '%s is the next item I have for you on your list.',
-        '<prosody volume="loud" pitch="+5%%" rate="medium">Alrighty!</prosody><break time=".3s"/> %s is the next item on your list! '
+        'The next item I have for you is: "%s".',
+        'Next is: "%s".',
+        'Next on the list is: "%s".',
+        '"%s" is the next item I have for you on your list.',
+        '<prosody volume="loud" pitch="+5%%" rate="medium">Alrighty!</prosody><break time=".3s"/> "%s" is the next item on your list! '
     ],
     NEXT_ITEM_REPROMPT: [
-        'To get the next item on the list, you can say: "next". What would you like to do?',
-        'Say: next, to get the next item. Or, you can say "check off item", to check this one off your list. What do you want to do next?',
-        'If you would like to proceed with the next item say: next item. <emphasis level="strong">Or</emphasis> you can check the item off the list by saying: check. What do you want to do next?',
+        'To get the next item on the list, you can say: "next". <emphasis level="strong">Or</emphasis> to check the item off your list you can say: "check off item". What would you like to do?',
+        'You can say: next, to get the next item. Or, you can say "check off item", to check this one off your list. What do you want to do next?',
+        'If you would like to proceed to the next item say: next item. <emphasis level="strong">Or</emphasis> you can check the item off the list by saying: check. What do you want to do next?',
         'To proceed to the next item say: next item. <emphasis level="strong">Or</emphasis> if you want to check the item off, say: "check". What would you like to do?'
     ],
     HELP_PROMPT_GENERAL: 'If you are unsure about what to do next, you can say: help.',
     HELP_MESSAGE_LIST_MISSING: 'Your %s list is missing. You can create a new list by saying "create new list."',
     HELP_MESSAGE_LIST_ALREADY_EXISTS: 'A %s list exists already. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list." If you have already deleted the list simply say "create new list."',
     HELP_MESSAGE_STATE_SURVEY: 'Please answer the questions asked so that I can customize your %s list. You can resume the survey by saying continue.',
-    HELP_MESSAGE_STATE_LIST: 'To get the next item on your list. Simply say, "next" or "next item." <break time=".2s"/> To check the last item off the list, you can say: "check off item".',
+    HELP_MESSAGE_STATE_LIST: 'To get the next item on your list. Simply say, "next" or "next item." <break time=".2s"/> To check the last item off the list, you can say: "check off item" <break time=".2s"/> <emphasis level="strong">Or</emphasis> to get the last item we reviewed on your list say: "repeat".',
     HELP_MESSAGE_GENERAL: 'To get the next item on your list you can say "next" or "next item. Additionally, to hear all the remaining items on the list can say "review items remaining." Or to hear the completed items say "review completed items."',
     HELP_MESSAGE_STATE_COMPLETE: 'You have completed all items on your %s list. You can start over by saying restart. Or you can leave the skill by saying exit.',
     HELP_MESSAGE_ALL_LIST_ITEMS_REVIEWED: 'You have reviewed all items on your %s list. To hear all the remaining items on the list can say "review items remaining." To hear the completed items say "review completed items." Or to start over at the top of your list say "next" or "next item."',
     LIST_COMPLETE_MESSAGE_LAUNCH: 'Your %s list has been completed! Great job! You can start over by saying restart. Or leave the skill by saying exit.',
     LIST_COMPLETE_REPROMPT_LAUNCH: 'Since your %s list has been completed, you can either exit or create a new list by saying: restart.',
     MORE_INFO_NEXT_INSTRUCTION:[
-        '<break time=".3s"/> Now that I have repeated your most recent item, what would you like to do now?',
+        '<break time=".3s"/> Now that I have repeated the most recent item on your list, what would you like to do now?',
         '<break time=".3s"/> You can say: "next" to get the next item.',
         '<break time=".3s"/> Say: "next" to get the next item.',
     ],
     MORE_INFO_INSTRUCTIONS: [
         'If you would like more information say: "more info".',
         'If you would like more information you can say "more info".',
-        'Say: "more info", for more information on this item.',
-        'You can say: "More Info" for additional information on this list item".',
-        'You can say: "More Info" for additional information".'
+        'Please Say: "more info", if you would like additional information on this item.',
+        'If you would  like additional details, say: "more info".',
+        'For more information, you can say: "More Info".'
     ],
     MORE_INFO_NOT_AVAILABLE: 'Sorry. Unfortunately, I do not have more information on this particular item. To get the next item on the list say: next or next item. To repeat the last item given, say: repeat.',
     MORE_INFO_INVALID: 'You can\'t ask for more information at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
@@ -949,7 +955,7 @@ const NextItemIntentHandler = {
 
                   //getting the reprompt text
                   repromptText = getRandomArrayItem(reprompt_prompts);
-                  speechText += ' <break time=".3s">' + repromptText;
+                  speechText += ' ' + repromptText;
 
                   cur_session_attrs.list_items_ids[current_list_item.id] = {'name': current_list_item.value, 'type': 'custom', 'is_reviewed': true}
               }else{
@@ -1002,13 +1008,13 @@ const NextItemIntentHandler = {
                           speechText = getRandomArrayItem(next_item_prompts);
                           speechText = jsUcfirst(speechText);
                           if(nextItem.hasOwnProperty('short_description')){
-                              speechText += ' <break time=".3s">'+nextItem.short_description;
+                              speechText += ' '+nextItem.short_description;
                           }
                           console.log('the speech text is', speechText);
                           if(nextItem.hasOwnProperty('full_description')){
                               let more_info_prompts = requestAttributes.t('MORE_INFO_INSTRUCTIONS');
                               let moreinfo_instructions = getRandomArrayItem(more_info_prompts);
-                              speechText += ' <break time=".3s">'+ moreinfo_instructions;
+                              speechText += ' '+ moreinfo_instructions;
                           }
                           speechText += ' '+repromptText;
                           console.log('scoped speech text', speechText);
@@ -1018,25 +1024,25 @@ const NextItemIntentHandler = {
                           speechText = getRandomArrayItem(next_item_prompts);
                           console.log('the speech text is', speechText);
                           if(nextItem.hasOwnProperty('short_description')){
-                              speechText += ' <break time=".3s">'+nextItem.short_description;
+                              speechText += ' '+nextItem.short_description;
                           }
                           if(nextItem.hasOwnProperty('full_description')){
                               let more_info_prompts = requestAttributes.t('MORE_INFO_INSTRUCTIONS');
                               let moreinfo_instructions = getRandomArrayItem(more_info_prompts);
-                              speechText += ' <break time=".3s">'+ moreinfo_instructions;
+                              speechText += ' '+ moreinfo_instructions;
                           }
-                          speechText += ' <break time=".2s">'+repromptText;
+                          speechText += ' '+repromptText;
                           console.log('scoped speech text', speechText);
                       }
 
                       console.log('next itemhandler :reprompt_prompts', reprompt_prompts);
                       repromptText = getRandomArrayItem(reprompt_prompts);
 
-                      let cardText = speechText;
+                      let cardText = stripTags(speechText);
                       if(nextItem.hasOwnProperty('full_description')){
-                          cardText = nextItem.full_description;
+                          cardText = stripTags(nextItem.full_description);
                       }
-                      console.log('cardText', cardText);
+
 
                       //TODO test cards
                       attributesManager.setSessionAttributes(sessionAttributes);

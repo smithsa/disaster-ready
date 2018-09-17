@@ -33,7 +33,7 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/can+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/can+large.jpg",
-          "short_description": "Select relatively nutritious, easy to store, and do not require refrigeration, cooking, water, or special preparation. Canned or vacuum packaged foods are a good option. Keep your food in a cool, dry place. And store boxed food in tightly closed plastic or metal containers",
+          "short_description": "Select foods that are relatively nutritious, easy to store, and do not require refrigeration, cooking, water, or special preparation. Canned or vacuum packaged foods are a good option. Keep your food in a cool, dry place. And store boxed food in tightly closed plastic or metal containers.",
           "full_description": "Pay attention to the amount of food your household typically consumes to best determine the amount you need to store for at least 3 days. Keep in mind any food allergies and medically necessary dietary restrictions. Avoid salty foods and foods the require water to prepare."
       },
       {
@@ -62,8 +62,8 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/first+aid+kit+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/first+aid+kit+large.jpg",
-          "short_description": "Make sure your first aid kit includes non-prescription painkillers, anti-diarrhea medication, blister pads, burn ointment, rubbing alcohol, scissors, and please listen to our extended description for more first aid kit supplies. ",
-          "full_description": "Make an inventory and store all the essential medication and prescriptions you and the people in your household use on a daily basis. More vital items for your first aid kit are gauze and adhesive tape, bandaids, iodine, antihistamine tablets, sunblock, thermometer, swabs, latex gloves, and antacid tablets"
+          "short_description": "Make sure your first aid kit includes non-prescription painkillers, anti-diarrhea medication, blister pads, burn ointment, rubbing alcohol, and scissors. Listen to the extended description for more first aid kit supplies. ",
+          "full_description": "Make an inventory and store all the essential medication and prescriptions, you and the people in your household use on a daily basis. More vital items for your first aid kit are gauze and adhesive tape, bandaids, iodine, antihistamine tablets, sunblock, thermometer, swabs, latex gloves, and antacid tablets"
       },
       {
           "id": 8,
@@ -78,6 +78,7 @@ module.exports = {
           "id": 9,
           "name": "Whistle",
           "type": "general",
+          "use_a": true,
           "short_description": "Using a whistle can help alert emergency responders that you are in need of help. In times when you are unable to shout, whistles are vital.",
           "full_description": "Did you know there is an international whistle code? One whistle blow means: Where are you? Two whistle blows mean: Come to me. And three whistle blows mean: I need help. So, if you are in distress blow 3 times."
       },
@@ -85,7 +86,7 @@ module.exports = {
           "id": 10,
           "name": "Dust Masks",
           "type": "general",
-          "short_description": "They will help filter the air you're breathing, helping you avoid breathing in harmful particles. If you don't have a dust mask available you can substitute this with a cotton shirt but dust masks are preferred."
+          "short_description": "They will help filter the air you're breathing, helping you avoid breathing in harmful particles. If you don't have a dust mask available you can substitute this with a cotton shirt. But dust masks are preferred."
       },
       {
           "id": 11,
@@ -109,7 +110,7 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/pliars+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/pliars+large.jpg",
-          "short_description": "These can be used to turn off your utilities. Before or, after a disaster, you should make sure your natural gas, water valve, and electricity are shut off to avoid fires, explosions, and preserve water. Learn how to shut off these utilities before a disaster strikes."
+          "short_description": "These can be used to turn off your utilities. Before or after a disaster, you should make sure your natural gas, water valve, and electricity are shut off to avoid fires, explosions, and preserve water. Learn how to shut off these utilities before a disaster strikes."
       },
       {
           "id": 14,
@@ -126,8 +127,8 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/phone+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/phone+large.jpg",
-          "short_description": "Cellphones can an invaluable resource for disasters. It can quickly give you access to important information before, during, and after a disaster. And also help you stay in touch with family and friends, letting them know if you are okay after a disaster hits.",
-          "full_description": "You should consider storing useful contact information such as your emergency contacts, local police and fire departments, as well as your utility companies. Also, you can download the FEMA App to receive alerts."
+          "short_description": "Cellphones can be an invaluable resource for disasters. It can quickly give you access to important information before, during, and after a disaster. And also help you stay in touch with family and friends, letting them know if you are okay after a disaster hits.",
+          "full_description": "You should consider storing useful contact information such as your emergency contacts, local police and fire departments, as well as your utility companies in your phone. Also, you can download the FEMA App to receive alerts."
       },
       {
           "id": 16,
@@ -135,7 +136,7 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/matches+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/matches+large.jpg",
-          "short_description": "Store these in a waterproof container."
+          "short_description": "Store your matches in a waterproof container."
       },
       {
           "id": 17,
@@ -143,7 +144,7 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/family+papers+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/family+papers+large.jpg",
-          "short_description": "This can include documents such as copies of insurance policies, deeds, property records, identification and bank account records. Save these electronically or in a waterproof, portable container."
+          "short_description": "This can include documents such as copies of insurance policies, deeds, property records, identification, and bank account records. Save these electronically, or store them in a waterproof, portable container."
       },
       {
           "id": 18,
@@ -151,7 +152,7 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/clothes+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/clothes+large.jpg",
-          "short_description": "For each household member. Make sure your clothing is appropriate for your climate. Also include a pair of sturdy shoes."
+          "short_description": "You should have a spare change of clothes for each household member. Make sure your clothing is appropriate for your climate. Also include a pair of sturdy shoes."
       },
       {
           "id": 19,
@@ -159,7 +160,7 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/pen+on+paper++small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/pen+on+paper+large.jpg",
-          "short_description": "You may need to write down important information."
+          "short_description": "Have these two items on hand, because You may need to write down important information."
       },
       {
           "id": 20,
@@ -174,7 +175,7 @@ module.exports = {
           "id": 21,
           "name": "Household Chlorine Bleach and Medicine Dropper",
           "type": "general",
-          "short_description": "It can help with sanitation by disinfecting surfaces. Also if you can not boil your water, these items will come in handy to help you disinfect water. Avoid scented, color safe, or bleaches with added cleaners.",
+          "short_description": "It can help with sanitation by cleaning surfaces. Also if you can't boil your water, these items will come in handy to help you disinfect water. Avoid scented, color safe, or bleaches with added cleaners.",
           "full_description": "When diluted nine parts water to one part bleach, bleach can be used as a disinfectant. Or in an emergency, you can use it to treat water by using 16 drops of regular household liquid bleach per gallon of water."
       },
       {
@@ -184,7 +185,7 @@ module.exports = {
           "image_small": "https://s3.amazonaws.com/disasterready/money+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/money+large.jpg",
           "short_description": "Keep a small amount of cash or a traveler's check at home in a safe place. ",
-          "full_description": "It is important to have small bills on hand because ATMs and credit cards may not work during a disaster when you need to purchase necessary supplies, fuel or food."
+          "full_description": "It is important to have small bills on hand, because ATMs and credit cards may not work during a disaster or national emergency. You may need to buy necessary supplies, fuel, or food for your family."
       },
       {
           "id": 23,
@@ -209,7 +210,7 @@ module.exports = {
           "type": "hasInfants",
           "image_small": "https://s3.amazonaws.com/disasterready/formula+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/formula+large.jpg",
-          "short_description": "Even if you breastfeed, you will need formula in case you are unable to produce milk. Keep the formula in a dry cool place."
+          "short_description": "Even if you breastfeed, you will need formula in case you are unable to produce milk. Keep the formula in a cool dry place."
       },
       {
           "id": 26,
@@ -217,7 +218,7 @@ module.exports = {
           "type": "hasInfants",
           "image_small": "https://s3.amazonaws.com/disasterready/bottle+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/bottle+large.jpg",
-          "short_description": "These will be vital for fluid nourishment for your baby. Keep them in a clean safe place."
+          "short_description": "These will be vital for fluid nourishment. Keep them in a clean safe place."
       },
       {
           "id": 27,
@@ -225,7 +226,7 @@ module.exports = {
           "type": "hasInfants",
           "image_small": "https://s3.amazonaws.com/disasterready/moist+toilettes+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/moist+toilettes+large.jpg",
-          "short_description": "Use these to keep your child clean."
+          "short_description": "Good hygiene and sanitation is important for your child to avoid illness. Use these to keep your child clean."
       },
       {
           "id": 28,
@@ -241,7 +242,7 @@ module.exports = {
           "type": "hasInfants",
           "image_small": "https://s3.amazonaws.com/disasterready/rash+cream+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/rash+cream+large.jpg",
-          "short_description": "Have a tube of it in your kit.  if your baby develops a diaper rash it can provide relief."
+          "short_description": "Have a tube of it in your kit. If your baby develops a diaper rash it can provide relief."
       },
       {
           "id": 30,
@@ -249,11 +250,11 @@ module.exports = {
           "type": "hasInfants",
           "image_small": "https://s3.amazonaws.com/disasterready/baby+toys+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/baby+toys+large.jpg",
-          "short_description": "The last thing you need when a disaster hits is a crying baby. Pack a toy or item to soothe your baby."
+          "short_description": "A distressed or crying infant can be a distraction, and pull your attention away from an emergency. You should pack a toy or item to help soothe your baby."
       },
       {
           "id": 31,
-          "name": "Personal Hygiene Items",
+          "name": "Personal Hygiene Products",
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/hygiene+items+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/hygiene+items+large.jpg",
@@ -265,7 +266,7 @@ module.exports = {
           "type": "isMenstrating",
           "image_small": "https://s3.amazonaws.com/disasterready/feminine+hygiene+products+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/feminine+hygiene+products+large.jpg",
-          "short_description": "Stock up on either tampons, sanitary napkins, or menstrual cups. During, and after an emergency, or disaster you may not have time to get to a store.",
+          "short_description": "Stock up on either tampons, sanitary napkins, or menstrual cups. During and after an emergency, you may not have time to get to a store.",
       },
       {
           "id": 33,
@@ -273,7 +274,7 @@ module.exports = {
           "type": "hasPets",
           "image_small": "https://s3.amazonaws.com/disasterready/water+for+pet+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/water+for+pet+large.jpg",
-          "short_description": "Try to keep at least a 5 day supply of food for each animal. Store the food waterproof containers."
+          "short_description": "Try to keep at least a 5 day supply of food for each animal. Store the food in waterproof containers."
       },
       {
           "id": 34,
@@ -289,7 +290,7 @@ module.exports = {
           "type": "hasEyeGlasses",
           "image_small": "https://s3.amazonaws.com/disasterready/glasses+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/glasses+large.jpg",
-          "short_description": "If someone in your home wears glasses they will need a spare pair of glasses in case anything happens to the ones you normally wear. Or if they wear contacts, a good supply of contact solution."
+          "short_description": "If someone in your home wears glasses, they will need a spare pair. Just in case anything happens to the they you normally wear. Or if they wear contacts, a plentiful supply of contact solution."
       },
       {
           "id": 36,
@@ -297,8 +298,8 @@ module.exports = {
           "type": "hasSchoolAgedChildren",
           "image_small": "https://s3.amazonaws.com/disasterready/child+toy+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/child+toy+large.jpg",
-          "short_description": "When there is an emergency, it take children away from their normal routine. Having supply items to entertain them will help keep them calm.",
-          "full_description": "Additionally you can consider items that bring comfort to your child. Disaster can be scary for kids and they may need something to ease their fears and anxiety. "
+          "short_description": "When there is an emergency, it takes children away from their normal routine. Having supply items to entertain them will help keep them calm.",
+          "full_description": "Additionally, you can consider items that can bring comfort to your child. Disaster or emergencies can be scary for kids and they may need something to ease their fears, and anxiety. "
       },
       {
           "id": 37,
