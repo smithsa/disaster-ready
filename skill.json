@@ -29,8 +29,10 @@
           ]
         }
       },
+      "smallIconUri": "https://s3.amazonaws.com/disasterready/disaster-ready-icon-108px.png",
+      "largeIconUri": "https://s3.amazonaws.com/disasterready/disaster-ready-icon-512px.png",
       "isAvailableWorldwide": true,
-      "testingInstructions": "Sample Testing Instructions.",
+      "testingInstructions": "To start testing you can open the skill by saying 'Alexa, open disaster ready.' From here you will need to take a survey of 6 questions. Answer yes or no to them.\n\nOnce the survey is complete, it creates a household list via the household api. You can use the skill to get the next active item on the list, check the item off, uncheck the item, or get more information on the item. Instructions are given along the way. To get an item say 'next' or 'next item'\n\nOnce you have reviewed all items on the list, you will be given the option to review all remaining items or review all completed items on your list.\n\nOnce you have completed all the items on the list, the session will congratulate you and close out.",
       "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": []
     },
