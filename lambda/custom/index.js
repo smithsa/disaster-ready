@@ -52,21 +52,21 @@ const languageString = {
     },
     SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
     LIST_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list; great job!<audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Rethink your needs every year and update your kit as your household\'s needs change. And don\'t forget to replace expired items as needed. Thank you for using the Disaster Ready Skill. <audio src="soundbank://soundlibrary/ui/gameshow/amzn_ui_sfx_gameshow_outro_01"/>',
-    NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters. First, answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
+    NEW_SESSION_MESSAGE: 'Welcome to the %s Skill. I will walk you through building an emergency supply kit for disasters. First, answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
     NEW_SESSION_MESSAGE_REPROMPT: 'In order for me to create your customized %s list, you must first complete a short survey. To begin the survey say: "start survey".',
     RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE: [
-        "Welcome back to the %s skill. Let's pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.",
-        "Hey there! Welcome back to the %s skill. Let's continue where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.",
-        "Hello! Welcome back to the %s skill. Let's get back to work. You have %s %s remaining. You can say continue survey to answer the remaining %s."
+        "Welcome back to the %s Skill. Let's pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.",
+        "Hey there! Welcome back to the %s Skill. Let's continue where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.",
+        "Hello! Welcome back to the %s Skill. Let's get back to work. You have %s %s remaining. You can say continue survey to answer the remaining %s."
     ],
     RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE: [
-        'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your %s list you can say: "next item" or "next". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
+        'Welcome back to the %s Skill.<break time=".5s"/> To get the next item on your %s list you can say: "next item" or "next". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
         'Welcome back to %s. It\'s good to hear from you again!<break time=".5s"/> To get the next item on your %s list, you can say: "next item" or "next". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
         '<audio src="soundbank://soundlibrary/musical/amzn_sfx_trumpet_bugle_03"/><emphasis level="moderate">Hello!</emphasis> Welcome back. Let\'s get <emphasis level="strong">you</emphasis> %s. <break time=".3s"/> To get the next item on your %s list say: "next", <emphasis level="strong">or</emphasis> "next item". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
         '<audio src="soundbank://soundlibrary/musical/amzn_sfx_trumpet_bugle_03"/><emphasis level="moderate">Hello</emphasis> again! I\'m so glad you returned!. Let\'s get you %s.<break time=".3s"/> To get the next item on your %s list say: "next", <emphasis level="strong">or</emphasis> "next item". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
     ],
     CONTINUE_SURVEY_REPROMPT: 'You still have survey questions to complete. To resume the survey, simply say: continue',
-    START_PERMISSIONS_MISSING: 'Welcome to the %s skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
+    START_PERMISSIONS_MISSING: 'Welcome to the %s Skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
     GENERAL_PERMISSIONS_MISSING: 'I was unable to do what you asked. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
     RESTART_SESSION_LAUNCH_MESSAGE: 'Okay, let\'s start over. I will walk you through building an emergency supply kit for disasters again. Let\'s go through the survey once more to consider the unique needs of your household. To begin say: start survey.',
     RESTART_SESSION_LAUNCH_MESSAGE_REPROMPT: 'We will restart the process, and go through the survey again once you say: start survey',
@@ -80,7 +80,7 @@ const languageString = {
     LIST_EXISTS: 'Thank you for answering my questions. It appears an %s list already exists. If you wish to continue using the skill, delete the existing list in your Alexa app. Then reopen the skill and say "create new list."',
     LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create list."',
     LIST_EXISTS_LAUNCH_REPROMPT: 'Once you have deleted the existing %s list you should say "create new list."',
-    LIST_STATE_NOT_READY: '<emphasis level="moderate">Sorry</emphasis>, <break time=".2s"/>you can not get any list items until the survey is complete.',
+    LIST_STATE_NOT_READY: '<emphasis level="moderate">Sorry</emphasis>, <break time=".2s"/>you can not get any list items until the survey is complete. Say continue: to resume the survey.',
     INTRODUCTION_LIST_STATE_REPROMPT: 'When you are ready for the next item on your list, you can say: "next", <emphasis level="strong">or</emphasis> "next Item"',
     SURVEY_COMPLETE_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/> You can use this skill to check off items,<break time=".1s"/>and see which items you still need to get on your list. To get the first item on your list you can say: "next item" or "next"',
     SURVEY_COMPLETE_BRAND_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>I\'ve created a brand new emergency supply kit list for you.<break time=".5s"/> To get the first item on your list you can say: "next item" or "next"',
@@ -199,6 +199,7 @@ const languageString = {
         ' <break time=".3s"/>What can I help you with now? Say: "help", if you are unsure how to proceed.',
         ' <break time=".3s"/>What would you like to do now? If you are unsure how to proceed, you can ask for help.'
     ],
+    REPEAT_INVALID_NO_LIST: 'I can\'t repeat any list items until you have a list created. Please finsih the survey by saying: continue',
     REPEAT_INVALID: 'You can\'t ask me to repeat a list item at this stage of the skill. If you don\'t know how to proceed, please ask for help by saying: help.',
     GET_COMPLETED_ITEMS_INVALID: 'Your %s list has not been created yet, you can not review your completed items on your list. Resume your survey by saying: continue.',
     LIST_ITEM_NONE_EXISTANT: 'I was unable to retrieve the last list item I recited <break time=".2s"/>because the list item or the list no longer exists. Try getting the next item on the list by saying: next or next item.',
@@ -215,10 +216,10 @@ const languageString = {
         'Thank you for using %s. Goodbye.',
         'Thank you for using %s. See you later.',
         'Thank you for using %s. See you later alligator!',
-        'Thank you for using the %s skill. Bye!',
-        'Farewell, thank you for using the %s skill.',
-        'Toodles, thank you for using the %s skill.',
-        'Thanks for using the %s skill. Have a good one!',
+        'Thank you for using the %s Skill. Bye!',
+        'Farewell, thank you for using the %s Skill.',
+        'Toodles, thank you for using the %s Skill.',
+        'Thanks for using the %s Skill. Have a good one!',
         'Adiós, You are one step closer to being %s. See you later!',
         'Goodbye! Remember to check in and use %s again soon!',
         'Catch you later, remember to use %s again soon!'
@@ -276,6 +277,7 @@ const LaunchRequestHandler = {
         let speechText = requestAttributes.t('START_PERMISSIONS_MISSING', skill_name);
         return handlerInput.responseBuilder
             .speak(speechText)
+            .withShouldEndSession(true)
             .withAskForPermissionsConsentCard(permissions)
             .getResponse();
     }
@@ -545,12 +547,26 @@ const RepeatIntentHandler = {
         const attributesManager = handlerInput.attributesManager;
         const sessionAttribute = await attributesManager.getPersistentAttributes();
         const requestAttribute = attributesManager.getRequestAttributes();
+        if(typeof sessionAttribute.sessionState === 'undefined' || sessionAttribute.listID === null){
+            return handlerInput.responseBuilder
+                .withShouldEndSession(true)
+                .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+                .getResponse();
+        }
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
         let last_alexa_id = sessionAttribute.lastListItemID;
         let listId = sessionAttribute.listID;
         let list_items_ids = sessionAttribute.list_items_ids;
         let speechOutput = requestAttribute.t('REPEAT_INVALID');
         let repromptText = requestAttribute.t('REPEAT_INVALID');
+        if(sessionAttribute.sessionState === 'SURVEY'){
+            speechOutput = requestAttribute.t('REPEAT_INVALID_NO_LIST');
+            return handlerInput.responseBuilder
+                .withShouldEndSession(false)
+                .speak(speechOutput)
+                .reprompt(speechOutput)
+                .getResponse();
+        }
         if(sessionAttribute.sessionState === 'LIST'){
             const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
             const list_item = await listClient.getListItem(listId, last_alexa_id);
@@ -568,23 +584,23 @@ const RepeatIntentHandler = {
                 if(typeof nextItem !== 'undefined' && nextItem){
                     if(nextItem.hasOwnProperty('name')){
                         if(nextItem.hasOwnProperty('use_a')){
-                            speechOutput = requestAttribute.t('REPEAT_LIST_ITEM', list_item.value);
+                            speechOutput = requestAttribute.t('REPEAT_LIST_ITEM_WITH_A', list_item.value);
                             speechOutput = getRandomArrayItem(speechOutput);
 
                             if(nextItem.hasOwnProperty('full_description')){
-                                repromptText += '<break time=".3s"> You can also get more information by saying: "more info"';
+                                repromptText += '<break time=".3s"/> You can also get more information by saying: "more info"';
                             }
                             if(nextItem.hasOwnProperty('short_description')){
                                 speechOutput+= ' '+nextItem.short_description;
                             }
                         }else{
-                            speechOutput = requestAttribute.t('REPEAT_LIST_ITEM_WITH_A', list_item.value);
+                            speechOutput = requestAttribute.t('REPEAT_LIST_ITEM', list_item.value);
                             speechOutput = getRandomArrayItem(speechOutput);
                             if(nextItem.hasOwnProperty('short_description')){
                                 speechOutput+= ' '+nextItem.short_description;
                             }
                             if(nextItem.hasOwnProperty('full_description')){
-                                repromptText += '<break time=".3s"> You can also get more information by saying: "more info"';
+                                repromptText += '<break time=".3s"/> You can also get more information by saying: "more info"';
                             }
                         }
                         speechOutput += ' '+repromptText;
@@ -597,6 +613,7 @@ const RepeatIntentHandler = {
         return responseBuilder
             .withShouldEndSession(false)
             .speak(speechOutput)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -609,6 +626,11 @@ const MoreInfoIntentHandler = {
     async handle(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
         const sessionAttribute = await attributesManager.getPersistentAttributes();
+        if(typeof sessionAttribute.sessionState === 'undefined' || sessionAttribute.listID === null) {
+            return handlerInput.responseBuilder
+                .withShouldEndSession(true)
+                .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+        }
         const requestAttribute = attributesManager.getRequestAttributes();
         const disaster_kit_list = getDisasterKitItems(disaster_list_items, handlerInput.requestEnvelope.request.locale);
         console.log('SESSION STATE', sessionAttribute.sessionState);
@@ -667,6 +689,11 @@ const CheckOffItemIntentHandler = {
         const attributesManager = handlerInput.attributesManager;
         const requestAttributes = attributesManager.getRequestAttributes();
         const sessionAttributes = await attributesManager.getPersistentAttributes();
+        if(typeof sessionAttributes.sessionState === 'undefined' || sessionAttributes.listID || sessionAttributes.listID === null) {
+            return handlerInput.responseBuilder
+                .withShouldEndSession(true)
+                .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+        }
         const listID = sessionAttributes.listID;
         const listItemId = sessionAttributes.lastListItemID;
         const itemstatus = listStatuses.COMPLETED;
@@ -718,6 +745,11 @@ const UnCheckOffItemIntentHandler = {
         const attributesManager = handlerInput.attributesManager;
         const requestAttributes = attributesManager.getRequestAttributes();
         const sessionAttributes = await attributesManager.getPersistentAttributes();
+        if(typeof sessionAttributes.sessionState === 'undefined' || sessionAttributes.listID === null) {
+            return handlerInput.responseBuilder
+                .withShouldEndSession(true)
+                .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+        }
         const listID = sessionAttributes.listID;
         const listItemId = sessionAttributes.lastListItemID;
         const itemstatus = listStatuses.ACTIVE;
@@ -758,7 +790,12 @@ const GetCompletedItemsIntentHandler = {
     },
     async handle(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
-        const sessionAttribute = attributesManager.getSessionAttributes();
+        const sessionAttribute = await attributesManager.getPersistentAttributes();
+        if(typeof sessionAttribute.sessionState === 'undefined' || sessionAttribute.listID === null) {
+            return handlerInput.responseBuilder
+                .withShouldEndSession(true)
+                .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+        }
         const requestAttribute = attributesManager.getRequestAttributes();
         const list_name = requestAttribute.t('LIST_NAME');
         const listId = sessionAttribute.listID;
@@ -772,6 +809,7 @@ const GetCompletedItemsIntentHandler = {
 
                 return handlerInput.responseBuilder
                     .speak(speechOutPut)
+                    .withShouldEndSession(true)
                     .withAskForPermissionsConsentCard(permissions)
                     .getResponse();
 
@@ -796,6 +834,8 @@ const GetCompletedItemsIntentHandler = {
             speechOutPut += getRandomArrayItem(get_item_prompts);
         }
 
+        card_text = stripTags(card_text);
+
         const responseBuilder = handlerInput.responseBuilder;
         return responseBuilder
             .withShouldEndSession(false)
@@ -812,7 +852,12 @@ const GetRemainingItemsIntentHandler = {
     },
     async handle(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
-        const sessionAttribute = attributesManager.getSessionAttributes();
+        const sessionAttribute = await attributesManager.getPersistentAttributes();
+        if(typeof sessionAttribute.sessionState === 'undefined' || sessionAttribute.listID === null) {
+            return handlerInput.responseBuilder
+                .withShouldEndSession(true)
+                .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+        }
         const requestAttribute = attributesManager.getRequestAttributes();
         const list_name = requestAttribute.t('LIST_NAME');
         const listId = sessionAttribute.listID;
@@ -826,6 +871,7 @@ const GetRemainingItemsIntentHandler = {
 
                 return handlerInput.responseBuilder
                     .speak(speechOutPut)
+                    .withShouldEndSession(true)
                     .withAskForPermissionsConsentCard(permissions)
                     .getResponse();
 
@@ -850,6 +896,7 @@ const GetRemainingItemsIntentHandler = {
             speechOutPut += getRandomArrayItem(get_item_prompts);
         }
 
+        card_text = stripTags(card_text);
         const responseBuilder = handlerInput.responseBuilder;
         return responseBuilder
             .withShouldEndSession(false)
@@ -869,7 +916,12 @@ const NextItemIntentHandler = {
     let speechText, repromptText, reprompt_prompts;
     const attributesManager = handlerInput.attributesManager;
     const requestAttributes = attributesManager.getRequestAttributes();
-    let sessionAttributes =  await attributesManager.getPersistentAttributes() || {};
+    let sessionAttributes =  await attributesManager.getPersistentAttributes();
+    if(typeof sessionAttributes.sessionState === 'undefined' || sessionAttributes.listID === null) {
+      return handlerInput.responseBuilder
+          .withShouldEndSession(true)
+          .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
+    }
     let list_items_ids = sessionAttributes.list_items_ids;
     let current_list_id = sessionAttributes.listID;
     const list_name = requestAttributes.t('LIST_NAME');
@@ -882,7 +934,7 @@ const NextItemIntentHandler = {
     if(sessionAttributes.sessionState === 'SURVEY'){
         speechText = requestAttributes.t('LIST_STATE_NOT_READY');
         return handlerInput.responseBuilder
-            .withShouldEndSession(true)
+            .withShouldEndSession(false)
             .speak(speechText)
             .getResponse();
     }
@@ -904,6 +956,7 @@ const NextItemIntentHandler = {
 
           return handlerInput.responseBuilder
               .speak(speechText)
+              .withShouldEndSession(true)
               .withAskForPermissionsConsentCard(permissions)
               .getResponse();
 
@@ -997,7 +1050,7 @@ const NextItemIntentHandler = {
 
                       //getting the reprompt text
                       repromptText = getRandomArrayItem(reprompt_prompts);
-                      speechText += ' <break time=".3s">' + repromptText;
+                      speechText += ' <break time=".3s"/>' + repromptText;
                   }else{
                       let nextItem = getListItemsByInternalID(list_items_ids[current_list_item.id].id, disaster_kit_list);
                       nextItem = nextItem[0];
@@ -1050,7 +1103,7 @@ const NextItemIntentHandler = {
                           cardText = stripTags(nextItem.full_description);
                       }
 
-
+                      cardText = stripTags(cardText);
                       //TODO test cards
                       attributesManager.setSessionAttributes(sessionAttributes);
                       attributesManager.setPersistentAttributes(sessionAttributes);
@@ -1093,13 +1146,14 @@ const HelpIntentHandler = {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-    const session_attributes = handlerInput.attributesManager.getSessionAttributes();
+    const session_attributes = await handlerInput.attributesManager.getPersistentAttributes();
     const sessionState = session_attributes.sessionState;
     const list_name = requestAttributes.t('LIST_NAME');
     let speechText = '';
     let repromptText = '';
+   console.log('In help intent');
     if(session_attributes.listExists === true){
         speechText = requestAttributes.t('HELP_MESSAGE_LIST_ALREADY_EXISTS', list_name);
     }else if(session_attributes.listMissing  === true){
@@ -1136,6 +1190,7 @@ const CancelAndStopIntentHandler = {
   },
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    console.log('In canceled intent');
     let skill_name = requestAttributes.t('SKILL_NAME');
     let speechText = getRandomArrayItem(requestAttributes.t('GOODBYE_MESSAGES', skill_name));
     speechText += '<audio src="soundbank://soundlibrary/ui/gameshow/amzn_ui_sfx_gameshow_outro_01"/>';
@@ -1144,6 +1199,35 @@ const CancelAndStopIntentHandler = {
       .speak(speechText)
       .getResponse();
   },
+};
+
+const UnhandledIntent = {
+    canHandle() {
+        return true;
+    },
+    handle(handlerInput) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        let speechText = requestAttributes.t('UNHANDLED_GENERAL');
+        console.log('In unhandled');
+        if(sessionAttributes.sessionState === 'SURVEY'){
+            const temp_survey_intent = sessionAttributes.temp_SurveyIntent;
+            let questionsRemaining = countEmptyFields(temp_survey_intent);
+            let init_slot = getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
+            let surveyQuestions = requestAttributes.t('SURVEY_QUESTIONS');
+            let speechText = requestAttributes.t('UNHANDLED_SURVEY');
+
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .withShouldEndSession(false)
+                .getResponse();
+        }
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withShouldEndSession(false)
+            .getResponse();
+    },
 };
 
 const FallBackIntentHandler = {
@@ -1162,6 +1246,7 @@ const FallBackIntentHandler = {
             return handlerInput.responseBuilder
                 .reprompt(repromptOutput)
                 .speak(speechOutput)
+                .withShouldEndSession(false)
                 .getResponse();
         }else{
             let speechOutput = requestAttributes.t('FALLBACK_GENERAL');
@@ -1172,34 +1257,6 @@ const FallBackIntentHandler = {
                 .reprompt(repromptOutput)
                 .getResponse();
         }
-    },
-};
-
-
-const UnhandledIntent = {
-    canHandle() {
-        return true;
-    },
-    handle(handlerInput) {
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        let speechText = requestAttributes.t('UNHANDLED_GENERAL');
-        if(sessionAttributes.sessionState === 'SURVEY'){
-            const temp_survey_intent = sessionAttributes.temp_SurveyIntent;
-            let questionsRemaining = countEmptyFields(temp_survey_intent);
-            let init_slot = getNextListItem(questionsRemaining, requestAttributes.t('SURVEY_QUESTIONS_SLOTS'));
-            let surveyQuestions = requestAttributes.t('SURVEY_QUESTIONS');
-            let speechText = requestAttributes.t('UNHANDLED_SURVEY');
-
-            return handlerInput.responseBuilder
-                .speak(speechText)
-                .withShouldEndSession(false)
-                .getResponse();
-        }
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .getResponse();
     },
 };
 

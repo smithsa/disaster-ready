@@ -307,7 +307,6 @@ module.exports = {
           "type": "general",
           "image_small": "https://s3.amazonaws.com/disasterready/container+small.jpg",
           "image_large": "https://s3.amazonaws.com/disasterready/container+large.jpg",
-          "use_a": true,
           "short_description": "Find 1 to 2 easy-to-carry containers for your kit. They should be able to hold all your items. Items such as plastic bins or a duffel bag should fit this need.",
           "full_description": "You will want to keep all your items in one place; however, a large duffle bag may work for one to two people but not a family. An alternative is to plan for each family member to prepare a backpack with their supplies and share a large container with general necessities.  "
       }

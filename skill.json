@@ -6,11 +6,12 @@
           "summary": "Be prepared when disaster strikes and protect you and your family in the event of emergencies.",
           "examplePhrases": [
             "Alexa, open disaster ready",
-            "Alexa, ask disaster ready to get the next item",
-            "Alexa, ask disaster ready to get the last item"
+            "Alexa, launch disaster ready"
           ],
           "name": "Disaster Ready",
           "description": "Be prepared when a disaster strikes and protect you and your family in the event of emergencies with Disaster Ready. This skill helps you assemble an emergency supply kit for your household based on recommendations from FEMA. In addition, it gives you tips on how to use the supplies in your kit.\n\nTake a short survey identifying your specific household needs, and Disaster Ready will generate a custom emergency supply kit list for you that you can manage and access via the skill or in your Alexa App on your mobile device. Mark off items as you are guided through the list in the skill or mark off items in the Alexa app list section. Additionally, as you are walked through each supply items that should be included in your kit, tips and recommendations are given on how and when to use these items in the case of an emergency or disaster.\n\nPlease leave a review if you enjoyed using this skill. If you need support or have suggestions on how to improve the skill, send feedback to smithsade13@gmail.com.",
+          "smallIconUri": "https://s3.amazonaws.com/disasterready/disaster-ready-icon-108px.png",
+          "largeIconUri": "https://s3.amazonaws.com/disasterready/disaster-ready-icon-512px.png",
           "keywords":[
             "disaster kit",
             "emergency supply kit",
@@ -29,8 +30,6 @@
           ]
         }
       },
-      "smallIconUri": "https://s3.amazonaws.com/disasterready/disaster-ready-icon-108px.png",
-      "largeIconUri": "https://s3.amazonaws.com/disasterready/disaster-ready-icon-512px.png",
       "isAvailableWorldwide": true,
       "testingInstructions": "To start testing you can open the skill by saying 'Alexa, open disaster ready.' From here you will need to take a survey of 6 questions. Answer yes or no to them.\n\nOnce the survey is complete, it creates a household list via the household api. You can use the skill to get the next active item on the list, check the item off, uncheck the item, or get more information on the item. Instructions are given along the way. To get an item say 'next' or 'next item'\n\nOnce you have reviewed all items on the list, you will be given the option to review all remaining items or review all completed items on your list.\n\nOnce you have completed all the items on the list, the session will congratulate you and close out.",
       "category": "EDUCATION_AND_REFERENCE",
@@ -41,7 +40,12 @@
       "usesPersonalInfo": false,
       "isChildDirected": false,
       "isExportCompliant": true,
-      "containsAds": false
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://s3.amazonaws.com/disasterready/privacy-policy.html"
+        }
+      }
     },
     "apis": {
       "custom": {
