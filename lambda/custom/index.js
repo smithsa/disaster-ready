@@ -568,7 +568,7 @@ const RepeatIntentHandler = {
                 if(typeof nextItem !== 'undefined' && nextItem){
                     if(nextItem.hasOwnProperty('name')){
                         if(nextItem.hasOwnProperty('use_a')){
-                            speechOutput = requestAttribute.t('REPEAT_LIST_ITEM_WITH_A', list_item.value);
+                            speechOutput = requestAttribute.t('REPEAT_LIST_ITEM', list_item.value);
                             speechOutput = getRandomArrayItem(speechOutput);
 
                             if(nextItem.hasOwnProperty('full_description')){
