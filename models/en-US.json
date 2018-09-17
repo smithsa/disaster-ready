@@ -68,14 +68,28 @@
           "slots": [],
           "samples": [
             "get next item",
+            "get next item on the list",
+            "get the next item on the list",
+            "get the next item",
+            "to get the next item",
             "next item",
+            "next item on the list",
             "please get next item",
+            "please get the next item",
+            "please get the next item on the list",
+            "please get next item on the list",
+            "please get the next item on the list",
+            "please get next item on my list",
+            "please get the next item on my list",
             "next item",
             "please get next",
+            "please get the next",
             "please next",
             "get next",
             "next",
             "please get next kit item",
+            "please get next kit item on my list",
+            "please get next kit item on the list",
             "get next kit item",
             "next kit item",
             "get next item please",
@@ -88,14 +102,19 @@
             "get next item please",
             "ready",
             "ready for next",
-            "ready for next item"
+            "ready for next item",
+            "ready for next item on the list",
+            "ready for next item on my list"
           ]
         },
         {
           "name": "CreateNewListIntent",
           "slots": [],
           "samples": [
-            "create new list"
+            "create new list",
+            "create a new list",
+            "create the new list",
+            "create list"
           ]
         },
         {
@@ -222,7 +241,10 @@
           "slots": [],
           "samples": [
             "repeat",
-            "repeat item"
+            "repeat item",
+            "repeat last item",
+            "what was the last item",
+            "get me the last item"
           ]
         }
       ],
@@ -356,7 +378,7 @@
           },
           {
             "type": "PlainText",
-            "value": "Is there a young child or baby in your home?"
+            "value": "Is there a infant or baby in your home?"
           }
         ]
       },
@@ -391,11 +413,11 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "Is there a member of your family who needs glasses to see?"
+            "value": "Is there a member of your family who needs glasses or contact lenses to see?"
           },
           {
             "type": "PlainText",
-            "value": "Does anyone in your home wear prescription eyeglasses?"
+            "value": "Does anyone in your home wear prescription eyeglasses or contact lenses?"
           }
         ]
       },

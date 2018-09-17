@@ -3,20 +3,43 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Sample Short Description",
+          "summary": "Be prepared when disaster strikes and protect you and your family in the event of emergencies.",
           "examplePhrases": [
-            "Alexa open disaster ready",
-            "Alexa tell disaster ready hello",
-            "Alexa ask disaster ready say hello"
+            "Alexa, open disaster ready",
+            "Alexa, ask disaster ready to get the next item",
+            "Alexa, ask disaster ready to get the last item"
           ],
           "name": "Disaster Ready",
-          "description": "Sample Full Description"
+          "description": "Be prepared when a disaster strikes and protect you and your family in the event of emergencies with Disaster Ready. This skill helps you assemble an emergency supply kit for your household based on recommendations from FEMA. In addition, it gives you tips on how to use the supplies in your kit.\n\nTake a short survey identifying your specific household needs, and Disaster Ready will generate a custom emergency supply kit list for you that you can manage and access via the skill or in your Alexa App on your mobile device. Mark off items as you are guided through the list in the skill or mark off items in the Alexa app list section. Additionally, as you are walked through each supply items that should be included in your kit, tips and recommendations are given on how and when to use these items in the case of an emergency or disaster.\n\nPlease leave a review if you enjoyed using this skill. If you need support or have suggestions on how to improve the skill, send feedback to smithsade13@gmail.com.",
+          "keywords":[
+            "disaster kit",
+            "emergency supply kit",
+            "emergency kit",
+            "survival kit",
+            "disaster preparedness",
+            "emergency preparedness",
+            "prepare for disaster",
+            "prepare for emergency",
+            "survival",
+            "survival tips",
+            "emergency tips",
+            "disaster tips",
+            "disaster prep",
+            "emergency prep"
+          ]
         }
       },
       "isAvailableWorldwide": true,
       "testingInstructions": "Sample Testing Instructions.",
       "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": []
+    },
+    "privacyAndCompliance":{
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
     },
     "apis": {
       "custom": {
