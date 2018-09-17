@@ -51,19 +51,19 @@ const languageString = {
         'hasSchoolAgedChildren': ['Are there school aged children in your household?', 'Do you have any young children in your home?', 'Is anyone in your household in primary or elementary school?']
     },
     SURVEY_QUESTIONS_INSTRUCTIONS: 'You can answer by saying "yes" or "no"',
-    LIST_COMPLETE_MESSAGE: '<prosody pitch="+5%%" volume="+2dB">You have checked off all the items on your Emergency Supply list.</prosody> <prosody pitch="+5%%" volume="+2dB">Congratulations!</prosody> <audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Rethink your needs every year and update your kit as your household\'s needs change. And don\'t forget to replace expired items as needed. <prosody pitch="+5%%" volume="+2dB">Thank you for using the Disaster Ready Skill.</prosody> <audio src="soundbank://soundlibrary/ui/gameshow/amzn_ui_sfx_gameshow_outro_01"/>',
-    NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters.<break time=".3s"/> <prosody pitch="medium">First</prosody>, answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
+    LIST_COMPLETE_MESSAGE: 'You have checked off all the items on your Emergency Supply list; great job!<audio src=\'https://s3.amazonaws.com/ask-soundlibrary/human/amzn_sfx_large_crowd_cheer_01.mp3\'/> Rethink your needs every year and update your kit as your household\'s needs change. And don\'t forget to replace expired items as needed. Thank you for using the Disaster Ready Skill. <audio src="soundbank://soundlibrary/ui/gameshow/amzn_ui_sfx_gameshow_outro_01"/>',
+    NEW_SESSION_MESSAGE: 'Welcome to the %s skill. I will walk you through building an emergency supply kit for disasters. First, answer %s short questions so I can consider the unique needs of your home.<break time=".3s"/> You can begin by saying start survey.',
     NEW_SESSION_MESSAGE_REPROMPT: 'In order for me to create your customized %s list, you must first complete a short survey. To begin the survey say: "start survey".',
     RETURNING_SESSION_MESSAGE_SURVEY_INCOMPLETE: [
-        '<prosody pitch="+5%%" volume="+2dB">Welcome back to the %s skill.</prosody> Let\'s pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.',
-        '<prosody pitch="+5%%" volume="+2dB">Hey there!</prosody> Welcome back to the %s skill. Let\'s continue where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.',
-        '<prosody pitch="+5%%" volume="+2dB">Hello!</prosody> Welcome back to the %s skill. Let\'s get back to work. You have %s %s remaining. You can say continue survey to answer the remaining %s.'
+        "Welcome back to the %s skill. Let's pick up where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.",
+        "Hey there! Welcome back to the %s skill. Let's continue where we left off. You have %s %s remaining. You can say continue survey to answer the remaining %s.",
+        "Hello! Welcome back to the %s skill. Let's get back to work. You have %s %s remaining. You can say continue survey to answer the remaining %s."
     ],
     RETURNING_SESSION_MESSAGE_SURVEY_COMPLETE: [
         'Welcome back to the %s skill.<break time=".5s"/> To get the next item on your %s list you can say: "next item" or "next". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
-        'Welcome back to %s. <prosody volume="loud" pitch="+5%%" rate="medium">It\'s</prosody> good to hear from you <prosody pitch="+8%%" rate="fast" volume="+1dB">again!</prosody><break time=".5s"/> To get the next item on your %s list, you can say: "next item" or "next". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
-        '<audio src="soundbank://soundlibrary/musical/amzn_sfx_trumpet_bugle_03"/><prosody pitch="+5%%" volume="+2dB"><emphasis level="moderate">Hello!</emphasis> Welcome back. Let\'s get <emphasis level="strong">you</emphasis> %s.</prosody> <break time=".3s"/> To get the next item on your %s list say: "next", <emphasis level="strong">or</emphasis> "next item". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
-        '<audio src="soundbank://soundlibrary/musical/amzn_sfx_trumpet_bugle_03"/><prosody pitch="+5%%" volume="+2dB"><emphasis level="moderate">Hello</emphasis> again! You\'ve been missed!.</prosody> Let\'s get you %s.<break time=".3s"/> To get the next item on your %s list say: "next", <emphasis level="strong">or</emphasis> "next item". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
+        'Welcome back to %s. It\'s good to hear from you again!<break time=".5s"/> To get the next item on your %s list, you can say: "next item" or "next". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
+        '<audio src="soundbank://soundlibrary/musical/amzn_sfx_trumpet_bugle_03"/><emphasis level="moderate">Hello!</emphasis> Welcome back. Let\'s get <emphasis level="strong">you</emphasis> %s. <break time=".3s"/> To get the next item on your %s list say: "next", <emphasis level="strong">or</emphasis> "next item". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
+        '<audio src="soundbank://soundlibrary/musical/amzn_sfx_trumpet_bugle_03"/><emphasis level="moderate">Hello</emphasis> again! I\'m so glad you returned!. Let\'s get you %s.<break time=".3s"/> To get the next item on your %s list say: "next", <emphasis level="strong">or</emphasis> "next item". <break time=".2s"/><emphasis level="strong">Or</emphasis> get the last item we covered by saying: repeat.',
     ],
     CONTINUE_SURVEY_REPROMPT: 'You still have survey questions to complete. To resume the survey, simply say: continue',
     START_PERMISSIONS_MISSING: 'Welcome to the %s skill. In order to use this skill you must grant Alexa: list read and write permissions within the Alexa app.',
@@ -81,7 +81,7 @@ const languageString = {
     LIST_EXISTS_LAUNCH: 'Last time we talked, it appeared an %s list already existed. Make sure you have deleted the list in your Alexa app. Then say "create new list." If you have already deleted the list just say "create list."',
     LIST_EXISTS_LAUNCH_REPROMPT: 'Once you have deleted the existing %s list you should say "create new list."',
     LIST_STATE_NOT_READY: '<emphasis level="moderate">Sorry</emphasis>, <break time=".2s"/>you can not get any list items until the survey is complete.',
-    INTRODUCTION_LIST_STATE_REPROMPT: 'When you are ready for the next item on your list, you can say: <prosody pitch="+10%%">"next"</prosody>, <emphasis level="strong">or</emphasis> "next Item"',
+    INTRODUCTION_LIST_STATE_REPROMPT: 'When you are ready for the next item on your list, you can say: "next", <emphasis level="strong">or</emphasis> "next Item"',
     SURVEY_COMPLETE_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/> You can use this skill to check off items,<break time=".1s"/>and see which items you still need to get on your list. To get the first item on your list you can say: "next item" or "next"',
     SURVEY_COMPLETE_BRAND_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>I\'ve created a brand new emergency supply kit list for you.<break time=".5s"/> To get the first item on your list you can say: "next item" or "next"',
     SURVEY_COMPLETE_NEW_LIST_REPROMPT: 'To get the first item on your list say: "next" or "next item". To get all items on the list you can say "get all remaining items"',
@@ -110,12 +110,14 @@ const languageString = {
         'Got it! I\'ve checked off %s.',
         'Okay, I\'ve checked off %s on your list. One step closer to being prepared!',
         'Roger that, %s has been checked off on your list.',
-        '<prosody rate="fast" pitch="+3%%" volume="+2dB">Okay rockstar</prosody>, %s has been checked off on your list.',
+        'Fantastic, %s has been checked off on your list.',
         'Keep up the good work, I\'ve checked off %s.',
         'Checking off %s.',
+        'Amazing work, checking off %s.',
+        'Did I ever tell you how awesome you are? I\'ve checked off %s.',
         'You got it! Checking off %s.',
         'Your wish is my command! Checking off %s.',
-        '<prosody rate="medium" pitch="+10%%" volume="+3dB">You rock!</prosody> Checking off %s.',
+        'You are a rockstar, checking off %s.',
         'Your wish is my command! %s has been checked off.'
     ],
     CHECK_INSTRUCTIONS: [
@@ -153,7 +155,7 @@ const languageString = {
         'Next is: "%s".',
         'Next on the list is: "%s".',
         '"%s" is the next item I have for you on your list.',
-        '<prosody volume="loud" pitch="+5%%" rate="medium">Alrighty!</prosody><break time=".3s"/> "%s" is the next item on your list! '
+        'Alrighty,<break time=".3s"/> "%s" is the next item on your list! '
     ],
     NEXT_ITEM_REPROMPT: [
         'To get the next item on the list, you can say: "next". <emphasis level="strong">Or</emphasis> to check the item off your list you can say: "check off item". What would you like to do?',
@@ -212,10 +214,15 @@ const languageString = {
     GOODBYE_MESSAGES: [
         'Thank you for using %s. Goodbye.',
         'Thank you for using %s. See you later.',
-        'Thank you for using %s. <prosody pitch="+2%%">See you later alligator!</prosody>',
-        'Thank you for using the %s skill. <prosody rate="fast" pitch="+30%%">Toodlesss!</prosody>',
-        '<prosody rate="fast" pitch="+15%%">Adiós!</prosody> You are one step closer to being %s. See you later!',
-        'Goodbye! Remember to check in and use %s again soon!'],
+        'Thank you for using %s. See you later alligator!',
+        'Thank you for using the %s skill. Bye!',
+        'Farewell, thank you for using the %s skill.',
+        'Toodles, thank you for using the %s skill.',
+        'Thanks for using the %s skill. Have a good one!',
+        'Adiós, You are one step closer to being %s. See you later!',
+        'Goodbye! Remember to check in and use %s again soon!',
+        'Catch you later, remember to use %s again soon!'
+    ],
     EXIT_MESSAGES: []
     },
   },
@@ -1393,7 +1400,7 @@ const stripTags = (someTextWithSSMLTags) => {
 }
 const countEmptyFields = (intent_obj) => {
     if(typeof intent_obj === "undefined"){
-        return 3;
+        return 6;
     }
     let slots = intent_obj.slots;
     let count = 0;
