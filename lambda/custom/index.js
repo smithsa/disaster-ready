@@ -82,7 +82,7 @@ const languageString = {
     LIST_EXISTS_LAUNCH_REPROMPT: 'Once you have deleted the existing %s list you should say "create new list."',
     LIST_STATE_NOT_READY: '<emphasis level="moderate">Sorry</emphasis>, <break time=".2s"/>you can not get any list items until the survey is complete. Say continue: to resume the survey.',
     INTRODUCTION_LIST_STATE_REPROMPT: 'When you are ready for the next item on your list, you can say: "next", <emphasis level="strong">or</emphasis> "next Item"',
-    SURVEY_COMPLETE_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/> You can use this skill to check off items,<break time=".1s"/>and see which items you still need to get on your list. To get the first item on your list you can say: "next item" or "next"',
+    SURVEY_COMPLETE_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>Thank you for answering my questions! I\'ve created an emergency supply kit list for your specific needs.<break time=".5s"/> You can use this skill to check off items,<break time=".1s"/>and see which items you still need to get on your list. You can also access this list on your alexa app. To get the first item on your list you can say: "next item" or "next"',
     SURVEY_COMPLETE_BRAND_NEW_LIST : '<audio src="https://s3.amazonaws.com/ask-soundlibrary/scifi/amzn_sfx_scifi_engines_on_02.mp3"/>I\'ve created a brand new emergency supply kit list for you.<break time=".5s"/> To get the first item on your list you can say: "next item" or "next"',
     SURVEY_COMPLETE_NEW_LIST_REPROMPT: 'To get the first item on your list say: "next" or "next item". To get all items on the list you can say "get all remaining items"',
     SURVEY_COMPLETE_INSTRUCTION : '',
@@ -127,11 +127,11 @@ const languageString = {
     ],
     UNCHECK_ERROR: 'Sorry, <break time=".2s"/>I was unable to uncheck off the last item on your list. Please make sure the list item exists. You can proceed by saying: "next".',
     UNCHECK_SUCCESS: [
-        'Your wish is my command! I\'ve unchecked %s on your list. To proceed and get the next item on your list, you can say: "next".',
-        'I\'ve unchecked %s on your list. Get the next item on your list by saying: "next".',
-        'I\'ve unchecked %s on your list. Get the next item on your list by saying: "next".',
-        'Understood. <break time=".2s"/>Get the next item on your list by saying: "next".',
-        'Got it, %s has been unchecked on your list. Say: "next" or "next item", to get the next item.'
+        'Your wish is my command! I\'ve unchecked %s on your list.',
+        'I\'ve unchecked %s on your list.',
+        'I\'ve unchecked %s on your list.',
+        'Understood. I have unchecked the item.<break time=".2s"/>',
+        'Got it, %s has been unchecked on your list.'
     ],
     UNCHECK_INSTRUCTIONS: [
         'To get the next item on your list. Just say: "next".',
@@ -159,7 +159,7 @@ const languageString = {
     ],
     NEXT_ITEM_REPROMPT: [
         'To get the next item on the list, you can say: "next". <emphasis level="strong">Or</emphasis> to check the item off your list you can say: "check off item". What would you like to do?',
-        'You can say: next, to get the next item. Or, you can say "check off item", to check this one off your list. What do you want to do next?',
+        'You can say: next, to get the next item. Or, you can say "check", to check this one off your list. What do you want to do next?',
         'If you would like to proceed to the next item say: next item. <emphasis level="strong">Or</emphasis> you can check the item off the list by saying: check. What do you want to do next?',
         'To proceed to the next item say: next item. <emphasis level="strong">Or</emphasis> if you want to check the item off, say: "check". What would you like to do?'
     ],
@@ -222,7 +222,7 @@ const languageString = {
         'Thanks for using the %s Skill. Have a good one!',
         'Adiós, You are one step closer to being %s. See you later!',
         'Goodbye! Remember to check in and use %s again soon!',
-        'Catch you later, remember to use %s again soon!'
+        'Catch ya later, remember to use %s again soon!'
     ],
     EXIT_MESSAGES: []
     },
@@ -686,10 +686,13 @@ const CheckOffItemIntentHandler = {
           && handlerInput.requestEnvelope.request.intent.name === 'CheckOffItemIntent';
     },
     async handle(handlerInput) {
+        console.log('In check off item intent');
         const attributesManager = handlerInput.attributesManager;
         const requestAttributes = attributesManager.getRequestAttributes();
+        console.log('calling await for persistnet variable');
         const sessionAttributes = await attributesManager.getPersistentAttributes();
-        if(typeof sessionAttributes.sessionState === 'undefined' || sessionAttributes.listID || sessionAttributes.listID === null) {
+        console.log('ending await for persistnet variable');
+        if(typeof sessionAttributes.sessionState === 'undefined' || sessionAttributes.listID === null) {
             return handlerInput.responseBuilder
                 .withShouldEndSession(true)
                 .speak('You don\'t have a list created yet, and can not use this command. Open the skill and start creating a list by saying: Alexa, Open Disaster Ready')
@@ -698,6 +701,7 @@ const CheckOffItemIntentHandler = {
         const listItemId = sessionAttributes.lastListItemID;
         const itemstatus = listStatuses.COMPLETED;
         let speechOutPut = requestAttributes.t('CHECK_OFF_ERROR');
+        console.log('speechOutPut:', speechOutPut);
         let instructionOutput = requestAttributes.t('CHECK_INSTRUCTIONS');
         instructionOutput = getRandomArrayItem(instructionOutput);
 
@@ -712,7 +716,9 @@ const CheckOffItemIntentHandler = {
         }
 
         const items = await getToDoItems(handlerInput, listID, listStatuses.ACTIVE);
+        console.log('check off items debug:', items);
         if(items === list_is_empty){
+            console.log('list item empty');
             if(item_checked_message !== null){
                 speechOutPut = item_checked_message +' <break time=".2s"/>'+requestAttributes.t('LIST_COMPLETE_MESSAGE');
             }else{
@@ -744,7 +750,7 @@ const UnCheckOffItemIntentHandler = {
     async handle(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
         const requestAttributes = attributesManager.getRequestAttributes();
-        const sessionAttributes = await attributesManager.getPersistentAttributes();
+        const sessionAttributes = attributesManager.getSessionAttributes();
         if(typeof sessionAttributes.sessionState === 'undefined' || sessionAttributes.listID === null) {
             return handlerInput.responseBuilder
                 .withShouldEndSession(true)
@@ -759,6 +765,7 @@ const UnCheckOffItemIntentHandler = {
         instructionOutput = getRandomArrayItem(instructionOutput);
 
         if(listItemId !== null){
+            //TODO get list item check
             let list_item_return = await updateListItem(handlerInput, listID, listItemId, itemstatus);
             let list_item_value = list_item_return.value;
             let uncheck_prompts = requestAttributes.t('UNCHECK_SUCCESS', list_item_value);
@@ -1003,7 +1010,6 @@ const NextItemIntentHandler = {
               let cur_session_attrs = attributesManager.getSessionAttributes();
               if(current_list_item !== null){
                   sessionAttributes.lastListItemID = current_list_item.id;
-
                   //getting the next item speech output
                   let next_list_item = current_list_item.value;
                   let next_item_prompts = requestAttributes.t('NEXT_ITEM_RECITATION', next_list_item);
@@ -1366,7 +1372,7 @@ async function updateListItem(handlerInput, listID, listItemID, listItemStatus) 
 async function getToDoItems(handlerInput, listId, listStatus) {
     const listClient = handlerInput.serviceClientFactory.getListManagementServiceClient();
 
-    console.log(`listid: ${listId}`);
+    console.log(`calling getToDoItems, listid: ${listId}`);
     const list = await listClient.getList(listId, listStatus);
     if (!list) {
         console.log('null list');
