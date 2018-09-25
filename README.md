@@ -49,6 +49,8 @@ You can navigate to the [Alexa Skills Kit Developer Console](https://developer.a
 
 Refer to Amazon's [Alexa Skills Kit Developer Console: Test](https://www.youtube.com/watch?v=lYImJ2H__BY) video from more instruction on how to test withing the console.
 
+To understand the commands you can give the skill watch the [view demo](https://youtu.be/Opmnp5Y1HdU).
+
 ## Built With
 *  [ASK SDK v2](https://github.com/alexa/alexa-skills-kit-sdk-for-nodejs)
 *  [Node](https://nodejs.org)
