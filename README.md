@@ -41,10 +41,12 @@ The user can access and manage the list through the skill or on their mobile pho
 You can test and run the skill through the command line or the Alexa Skills Kit Developer Console.
 
 **Command Line**
+
 Run the command below. For more information on this command refer to Alexa's [Simulate Command Documentaiton](https://developer.amazon.com/docs/smapi/ask-cli-command-reference.html#simulate-command)
 '''ask simulate -t [insert command here]'''
 
 **Alexa Skills Kit Developer Console**
+
 You can navigate to the [Alexa Skills Kit Developer Console](https://developer.amazon.com/alexa/console/ask). Select the skill you are workig on, and select the "Test" tab menu item at the top of the page. You can open the skill by typing "open [your skill name]." You can enter any other commands as well.
 
 Refer to Amazon's [Alexa Skills Kit Developer Console: Test](https://www.youtube.com/watch?v=lYImJ2H__BY) video from more instruction on how to test withing the console.
