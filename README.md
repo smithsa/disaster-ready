@@ -18,23 +18,33 @@ The user can access and manage the list through the skill or on their mobile pho
 1. Set up AWS IAM user. An AWS account is required since the skill will use Lambda. Additionally, you will need an AWS IAM user. Ensure that your AWS credentials are set up with the appropriate permissions on the computer to which you are installing ASK CLI. For more information on this step see Amazon's documentation: [Set Up Credentials for an Amazon Web Services (AWS) Account](https://developer.amazon.com/docs/smapi/set-up-credentials-for-an-amazon-web-services-account.html).
 
 2. Install ASK CLI. Please reference Amazon's ["Quick Start Alexa Skills Kit Command Line Interface"](https://developer.amazon.com/docs/smapi/quick-start-alexa-skills-kit-command-line-interface.html) if you are having trouble with this step.
-	'''npm install -g ask-cli'''
+	```
+	npm install -g ask-cli
+	```
 
 3. Initialize ASK CLI
-	'''ask init'''
+	```
+	ask init
+	```
 
 4. Create a new skill project. The newly created skill project folder will contain all necessary files to deploy it with minimal changes. You will replace these files with those in the repository eventually. 
-	'''ask new'''
+	```
+	ask new
+	```
 
 5. Clone the Disaster Ready project
-	'''git clone git@github.com:smithsa/disaster-ready.git'''
+	```
+	git clone git@github.com:smithsa/disaster-ready.git
+	```
 
 6. Copy contents of the newly cloned repository into the project you created at step 4.
 
 7. Ensure the name of the skill you used for step 4 matches in "skill.json." Additionally, set invocation name in models/en-US.json.
 
 8. Deploy the code to AWS Lambda
-	'''ask deploy'''
+	```
+	ask deploy
+	```
 
 ## Usage
 
@@ -43,7 +53,9 @@ You can test and run the skill through the command line or the Alexa Skills Kit 
 **Command Line**
 
 Run the command below. For more information on this command refer to Alexa's [Simulate Command Documentaiton](https://developer.amazon.com/docs/smapi/ask-cli-command-reference.html#simulate-command)
-'''ask simulate -t [insert command here]'''
+```
+ask simulate -t [insert command here]
+```
 
 **Alexa Skills Kit Developer Console**
 
