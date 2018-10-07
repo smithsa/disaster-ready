@@ -1,8 +1,6 @@
 /* eslint-disable  func-names */
 /* eslint-disable  no-console */
 
-//TODO Add auto-scaling for Dynamo
-
 const Alexa = require('ask-sdk-core');
 
 //DynamoDb Memory Persistence
