@@ -36,12 +36,22 @@ The user can access and manage the list through the skill or on their mobile pho
 	```
 	git clone git@github.com:smithsa/disaster-ready.git
 	```
-
+	
 6. Copy contents of the newly cloned repository into the project you created at step 4.
 
-7. Ensure the name of the skill you used for step 4 matches in "skill.json." Additionally, set invocation name in models/en-US.json.
+7. Navigate to `lambda/custom` directory
+    ```
+    cd train-arrival-times/lambda/custom
+    
+    ```
+8. Now install node packages
+    ```
+    npm install
+    ```
+    
+9. Ensure the name of the skill you used for step 4 matches in "skill.json." Additionally, set invocation name in models/en-US.json.
 
-8. Deploy the code to AWS Lambda
+10. Deploy the code to AWS Lambda
 	```
 	ask deploy
 	```
