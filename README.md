@@ -41,7 +41,7 @@ The user can access and manage the list through the skill or on their mobile pho
 
 7. Navigate to `lambda/custom` directory
     ```
-    cd train-arrival-times/lambda/custom
+    cd disaster-ready/lambda/custom
     
     ```
 8. Now install node packages
