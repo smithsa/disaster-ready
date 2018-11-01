@@ -67,13 +67,6 @@ Run the command below. For more information on this command refer to Alexa's [Si
 ask simulate -t [insert command here]
 ```
 
-## Contributing
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
 
 **Alexa Skills Kit Developer Console**
 
@@ -88,3 +81,11 @@ To understand the commands you can give the skill watch the [view demo](https://
 *  [Node](https://nodejs.org)
 *  [AWS Lambda](https://aws.amazon.com/lambda/)
 *  [AWS DynamoDB](https://aws.amazon.com/dynamodb/)
+
+## Contributing
+
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
